@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en" id="html" style="background-color: rgb(255, 255, 255); margin: 0px; padding: 0px; width: 100%;">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Website</title>
+    <base target="_self">
+
+
+    <style>
+        #html {
+            background-color: rgb(255, 255, 255);
+            margin: 0px;
+            padding: 0px;
+        }
+
+        #header {
+            margin: 0px;
+            background-color: rgb(224, 133, 215);
+            padding: 1rem;
+        }
+
+        #body {
+            margin: 0px;
+            padding: 0px;
+            min-height: 100vh;
+            font-family: Montserrat;
+            color: rgb(224, 133, 215);
+        }
+
+        #element_85366e983a2a4a9b {
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: rgb(224, 133, 215);
+        }
+
+        #element_47cef1bcf40b47b7 {
+            border-radius: 5px;
+            border: 2px solid rgb(224, 133, 215);
+            height: 40vh;
+            width: 60vw;
+            margin: 2rem 0rem 1rem;
+        }
+
+        #element_b53e0e1d5ebd48ae {
+            width: 60vw;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #element_858cce4c95524e10 {
+            padding: 1rem;
+        }
+
+        #element_0849c3d19e254d31 {
+            padding: 1rem;
+        }
+
+        #element_9cfb296a35d9408c {
+            padding: 1rem;
+        }
+
+        #element_5e845d77fbd34fcc {
+            padding: 1rem;
+        }
+
+        #element_26cf65e584e24d92 {
+            width: 60vw;
+            margin: 2rem;
+        }
+
+        #element_f2868fccda224bd3 {
+            display: grid;
+            grid-template-columns: 1fr 4fr;
+            width: 50vh;
+        }
+
+        #element_265b987ceb254fe9 {
+            padding: 1rem;
+        }
+
+        #element_eb13771f5d5e49fd {
+            padding: 1rem;
+        }
+
+        #temp_input {
+            margin: 0px;
+            padding: 0.5rem;
+            place-self: center start;
+            border: 2px solid rgb(224, 133, 215);
+            border-radius: 5px;
+        }
+
+
+        #element_895263f4e1ea4813 {
+            padding: 0rem;
+            color: rgb(255, 255, 255);
+        }
+
+        #element_4693fc43131b4716 {
+            padding: 1rem;
+        }
+
+        #element_c4ebd0ed321341be {
+            padding: 1rem;
+        }
+
+        .date_select {
+            padding: 1rem;
+            margin: 1rem;
+            border: 2px solid rgb(224, 133, 215);
+            border-radius: 5px;
+            width: 10rem;
+            color: rgb(224, 133, 215);
+        }
+
+        #submit_event {
+            padding: 0.5rem;
+            background-color: rgb(224, 133, 215);
+            width: 10rem;
+            margin: 0rem 1rem;
+            color: rgb(255, 255, 255);
+            font-size: 1.2rem;
+        }
+
+        .pink_border {
+            border: 2px solid rgb(224, 133, 215);
+            border-radius: 5px;
+            color: rgb(224, 133, 215);
+            background-color: rgb(255, 255, 255);
+        }
+
+        #submit_temp {
+            padding: 0.5rem;
+            background-color: rgb(224, 133, 215);
+            width: 10rem;
+            margin: 0rem 1rem;
+            color: rgb(255, 255, 255);
+            font-size: 1.2rem;
+        }
+
+        #element_3d30a70ff1c4447d {
+            display: flex;
+            flex-direction: column;
+        }
+
+        #event_type_dropdown {
+            padding: 1rem;
+            background-color: rgb(255, 255, 255);
+            border-radius: 5px;
+            border: 2px solid rgb(224, 133, 215);
+            color: rgb(224, 133, 215);
+            margin: 0rem 1rem;
+            width: 10rem;
+        }
+
+        #element_1f7656fec2654e5c {
+            padding: 0.2rem;
+            background-color: rgb(224, 133, 215);
+            width: 4rem;
+            margin: 0rem 2rem;
+            color: rgb(255, 255, 255);
+            align-self: end;
+            font-size: 0.7rem;
+        }
+
+
+        #graph_canvas {
+            
+            height: 40vh;
+            width: 60vw;
+        }
+
+        #temp_date_select {
+            margin: 1rem 0rem;
+        }
+
+
+        @media (max-width: 1024px) {}
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com" id="preconnect1">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" id="preconnect2">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&amp;display=swap"
+        id="Montserrat">
+</head>
+
+<body id="body">
+
+    <div id="header">
+        <h1 id="element_895263f4e1ea4813">Mommy Stats</h1>
+    </div>
+
+    <div id="element_85366e983a2a4a9b">
+        <div id="element_3d30a70ff1c4447d">
+            <div id="element_47cef1bcf40b47b7">
+                <canvas id="graph_canvas"></canvas>
+            </div>
+            <button id="element_1f7656fec2654e5c" class="pink_border">download</button>
+        </div>
+        <div id="element_b53e0e1d5ebd48ae">
+            <h2 id="element_7e557ad4033c45e2">Log Event</h2>
+            <select id="event_type_dropdown">
+                <option id="element_858cce4c95524e10" value="period_start">period start</option>
+                <option id="element_0849c3d19e254d31" value="period_end">period end</option>
+                <option id="element_4693fc43131b4716" value="positive_pregnancy_test">positive pregnancy test</option>
+                <option id="element_9cfb296a35d9408c" value="miscarriage_start">miscarriage start</option>
+                <option id="element_5e845d77fbd34fcc" value="miscarriage_end">miscarriage end</option>
+                <option id="element_c4ebd0ed321341be" value="spotting">spotting</option>
+            </select>
+            <input id="event_date_select" class="date_select" type="date">
+            <button id="submit_event" class="pink_border">Submit</button>
+        </div>
+        <div id="element_26cf65e584e24d92">
+            <h2 id="element_fde29288b6384ae3">Log Basal Body Temperature</h2>
+            <div id="element_f2868fccda224bd3">
+                <p id="element_265b987ceb254fe9">Temp</p>
+                <input id="temp_input" type="">
+                <p id="element_eb13771f5d5e49fd">Date</p>
+                <input id="temp_date_select" class="date_select" type="date">
+                <button id="submit_temp" class="pink_border">Submit</button>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+    <!-- general -->
+    <script>
+
+        let bb_temperatures = new Map();
+        let events = new Map();
+        let START_DATE = new Date("2025-12-01");
+        let END_DATE = new Date("2026-3-01");
+
+        let submit_event = document.getElementById("submit_event");
+        let submit_temp = document.getElementById("submit_temp");
+        let graph_canvas = document.getElementById("graph_canvas");
+        const ctx = graph_canvas.getContext('2d');
+
+
+        
+        submit_event.addEventListener("click", () => {
+
+        });
+        submit_temp.addEventListener("click", () => {
+            
+            const temp = parseFloat(document.getElementById("temp_input").value);
+            const date = new Date(document.getElementById("temp_date_select").value);
+            
+
+            // add to graph
+            bb_temperatures.set(
+                date_to_str(date),
+                temp
+            );
+            draw_graph(START_DATE, END_DATE, bb_temperatures, events);
+
+            // add to local storage
+
+        });
+
+
+
+    </script>
+
+
+    <!-- util -->
+    <script>
+        function date_to_str(date) {
+            const options = { month: 'numeric', day: 'numeric', year: 'numeric' };
+            return new Intl.DateTimeFormat('en-US', options).format(date);
+        }
+    </script>
+
+
+    <!-- graph -->
+    <script>
+        function draw_graph(start_date, end_date, bb_temperatures, events) {
+            // clear graph
+            const rect = graph_canvas.getBoundingClientRect();
+            graph_canvas.width = rect.width;
+            graph_canvas.height = rect.height;
+            ctx.clearRect(0, 0, graph_canvas.width, graph_canvas.height);
+
+            // determine x step
+            const DAY_IN_MS = 1000 * 60 * 60 * 24;
+            const num_days = (end_date - start_date) / DAY_IN_MS;
+            const step_x = graph_canvas.width / num_days;
+
+            // determine temp y step
+            let min_temp = bb_temperatures.size == 0? 96 : bb_temperatures.values().next().value;
+            let max_temp = bb_temperatures.size == 0? 100 : bb_temperatures.values().next().value;
+            for (let temp of bb_temperatures.values()) {
+                if (temp < min_temp) {
+                    min_temp = temp;
+                }
+                if (temp > max_temp) {
+                    max_temp = temp;
+                }
+            }
+            max_temp = min_temp == max_temp? min_temp + 2 : max_temp;
+            const Y_MARGIN = graph_canvas.height * .2;
+            const step_y = (graph_canvas.height - 2*Y_MARGIN) / (max_temp-min_temp);
+
+            // determine last temp
+            let last_date = null;
+            let last_temp = null; 
+            for (let key of bb_temperatures.keys()) {
+                const key_date = new Date(key);
+                if (start_date > key_date) {
+                    if (last_date == null) {
+                        last_date = key_date;
+                        last_temp = bb_temperatures.get(key);
+                    }
+                    else if (start_date - last_date > start_date - key_date) {
+                        last_date = key_date;
+                        last_temp = bb_temperatures.get(key);
+                    }
+                }
+            }
+            let last_temp_y = last_temp? graph_canvas.height - Y_MARGIN - step_y * (last_temp - min_temp) : null;
+            let last_temp_x = 0;
+
+            // walk through dates drawing
+            let curr_date = new Date(start_date.getTime());
+            let i = 0;
+            while (curr_date < end_date) {
+
+                // draw line if 1st day of the month
+                let x = step_x * i;
+                if (curr_date.getDate() == 1) {
+    
+                    ctx.beginPath();
+                    ctx.moveTo(x, 0);
+                    ctx.lineTo(x, graph_canvas.height);
+                    ctx.strokeStyle = 'rgb(200, 200, 200)';
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+
+                    const options = { month: 'short', year: 'numeric' };
+                    const formatted = new Intl.DateTimeFormat('en-US', options).format(curr_date);
+                    ctx.font = '20px Arial';
+                    ctx.fillStyle = 'rgb(200, 200, 200)';
+                    ctx.fillText(formatted, x + 5, graph_canvas.height - 20);
+                }
+
+                // draw temperature for this day
+                const date_str = date_to_str(curr_date);
+                if (bb_temperatures.has(date_str)) {
+                    let temp = bb_temperatures.get(date_str);
+                    let y = graph_canvas.height - Y_MARGIN - step_y * (temp - min_temp);
+                    ctx.beginPath();
+                    ctx.arc(x, y, 2.5, 0, Math.PI * 2); // full circle
+                    ctx.fillStyle = 'rgb(224, 133, 215)'; // color of the dot
+                    ctx.fill();
+    
+                    if (last_temp_y) {
+                        ctx.beginPath();
+                        ctx.moveTo(last_temp_x, last_temp_y);
+                        ctx.lineTo(x, y);
+                        ctx.strokeStyle = 'rgb(224, 133, 215)';
+                        ctx.lineWidth = 3;
+                        ctx.stroke();
+                    }
+                    last_temp_x = x;
+                    last_temp_y = y;
+                }
+
+
+                i++;
+                curr_date.setDate(curr_date.getDate() + 1);
+            }
+
+        }
+        draw_graph(START_DATE, END_DATE, bb_temperatures, events);
+
+    </script>
+
+
+
+
+
+</body>
+
+</html>
