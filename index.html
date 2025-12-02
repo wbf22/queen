@@ -429,7 +429,30 @@
         }
 
 
-        function mark_out_ovulation_days(start_date, ovulation_index) {
+        function mark_out_ovulation_days(event_days, start_date, ovulation_index) {
+
+            // check for ovulation symptoms
+            let start_j = event_days.length + (ovulation_index - 10)
+            for (let j = start_j; j < event_days.length; j++) {
+                if (j > 0) {
+                    if (event_days[j] == "clearer_slippery_mucus") {
+                        ovulation_index = j - event_days.length;
+                    }
+                    if (event_days[j] == "positive_ovulation_test" || event_days[j] == "faintly_positive_ovulation_test") {
+                        ovulation_index = j + 2 - event_days.length;
+                    }
+
+                    // modify if not ovulating
+                    if (
+                        (event_days[j-2] == "negative_ovulation_test" || event_days[j-2] == "sticky_or_thicker_mucus") &&
+                        ovulation_index == j-2 - event_days.length
+                    ) {
+                        ovulation_index++;
+                    }
+                }
+            }
+
+            // mark out days
             for (let o = ovulation_index - 5; o < ovulation_index; o++) {
                 let ovulation_date = get_date_plus_days(start_date, o);
                 predictions.set(date_to_str(ovulation_date), "ovulation");
@@ -552,20 +575,8 @@
                             }
 
                             // look back for ovulation (and predict past ovulations)
-                            let ovulation_index = -1;
-                            for (let j = i-20; j < i; j++) {
-                                if (i > 0) {
-                                    let possible_ovulation = event_days[j] == "positive_ovulation_test" || 
-                                        event_days[j] == "faintly_positive_ovulation_test" || 
-                                        event_days == "clearer_slippery_mucus";
-                                    if (possible_ovulation) {
-                                        ovulation_symptoms_to_period_start.push(i-j);
-                                        ovulation_index = j;
-                                    }
-                                }
-                            }
-                            ovulation_index = ovulation_index != -1? ovulation_index : current_period_start_index - avg_ovulation_symptoms_to_period_start;
-                            mark_out_ovulation_days(start_date, ovulation_index);
+                            ovulation_index = current_period_start_index - avg_ovulation_symptoms_to_period_start;
+                            mark_out_ovulation_days(event_days, start_date, ovulation_index);
                             
                         }
                     }
@@ -618,7 +629,7 @@
                 // if ovulation before next period
                 if (days_since_last_period > avg_ovulation_symptoms_to_period_start) {
                     let days_until_ovulation = days_until_next_period - avg_ovulation_symptoms_to_period_start;
-                    mark_out_ovulation_days(curr_date, days_until_ovulation);
+                    mark_out_ovulation_days(event_days, curr_date, days_until_ovulation);
                 }
 
                 if (!is_pregnant) {
@@ -678,7 +689,7 @@
 
                         // ovulation
                         let days_until_ovulation = days_until_next_period + p * avg_cycle_lenght - avg_ovulation_symptoms_to_period_start;
-                        mark_out_ovulation_days(curr_date, days_until_ovulation);
+                        mark_out_ovulation_days(event_days, curr_date, days_until_ovulation);
                     }
                 }
                 
@@ -986,9 +997,15 @@
                 if (predictions.has(date_str)) {
                     let prediction = predictions.get(date_str);
                     if (prediction == "ovulation_start") {
-                        let text = "" + curr_date.getDate();
+                        let text = curr_date.getDate() + " chance for pregnancy";
                         let color = "rgba(97, 250, 179, 1.0)";
                         let background_color = "rgba(97, 250, 179, 0.3)";
+
+                        // background
+                        ctx.fillStyle = background_color;
+                        ctx.fillRect(x, Y_MARGIN, step_x, graph_canvas.height - 2*Y_MARGIN);
+
+                        // flag
                         draw_flag(ctx, text, x, color, background_color, true);
 
                         ctx.beginPath();
@@ -1015,6 +1032,12 @@
                     }
                     else if (prediction == "ovulation") {
                         let color = "rgba(97, 250, 179, 1.0)";
+                        let background_color = "rgba(97, 250, 179, 0.3)";
+
+                        // background
+                        ctx.fillStyle = background_color;
+                        ctx.fillRect(x, Y_MARGIN, step_x, graph_canvas.height - 2*Y_MARGIN);
+
                         ctx.beginPath();
                         ctx.setLineDash([5, 5]);
                         ctx.lineWidth = 1;
@@ -1035,6 +1058,12 @@
                         let text = curr_date.getDate() + " ovulation";
                         let color = "rgba(97, 250, 179, 1.0)";
                         let background_color = "rgba(97, 250, 179, 0.3)";
+
+                        // background
+                        ctx.fillStyle = background_color;
+                        ctx.fillRect(x, Y_MARGIN, step_x, graph_canvas.height - 2*Y_MARGIN);
+
+                        // flag
                         draw_flag(ctx, text, x + step_x, color, background_color, true);
 
                         ctx.beginPath();
