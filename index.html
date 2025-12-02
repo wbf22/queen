@@ -19,6 +19,9 @@
             margin: 0px;
             background-color: rgb(224, 133, 215);
             padding: 1rem;
+            display: flex;
+            align-items: center;
+
         }
 
         #body {
@@ -29,13 +32,13 @@
             color: rgb(224, 133, 215);
         }
 
-        #element_85366e983a2a4a9b {
-            padding: 1rem;
+        #main_section {
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             color: rgb(224, 133, 215);
+            background-color: #ffffff;
         }
 
         #element_47cef1bcf40b47b7 {
@@ -96,8 +99,8 @@
         }
 
 
-        #element_895263f4e1ea4813 {
-            padding: 0rem;
+        #title {
+            padding: 1rem;
             color: rgb(255, 255, 255);
         }
 
@@ -192,10 +195,11 @@
 <body id="body">
 
     <div id="header">
-        <h1 id="element_895263f4e1ea4813">Mommy Stats</h1>
+        <h1 id="title">Queen</h1>
+        <svg width="3rem" height="3rem" viewBox="0 0 1024 1024" class="icon"  version="1.1" xmlns="http://www.w3.org/2000/svg"><path d="M978.254 300.427c0-44.771-36.295-81.066-81.066-81.066s-81.066 36.295-81.066 81.066c0 36.02 23.501 66.537 56 77.097-21.517 17.157-59.595 32.926-126.933 33.356-98.134 0.626-159.304-91.429-189.636-154.361 33.482-9.969 57.904-40.97 57.904-77.689 0-44.771-36.295-81.066-81.066-81.066s-81.066 36.295-81.066 81.066c0 36.404 23.999 67.203 57.038 77.443-31.165 62.724-93.137 154.607-188.769 154.607-73.523 0-114.78-18.623-137.64-37.145 27.448-12.988 46.441-40.925 46.441-73.307 0-44.771-36.295-81.066-81.066-81.066s-81.066 36.295-81.066 81.066c0 39.38 28.086 72.191 65.316 79.524-12.668 28.179-25.648 67.273-24.783 107.941l162.132 238.131c18.844 141.239 88.656 162.132 263.464 162.132 157.675 0 263.709-21.647 283.73-162.132l141.865-238.131c3.577-41.747-13.475-83.128-30.004-112.471 29.496-12.127 50.271-41.129 50.271-74.995zM491.787 178.828c0-22.427 18.179-40.606 40.606-40.606 22.427 0 40.606 18.179 40.606 40.606 0 22.427-18.179 40.606-40.606 40.606-22.427 0-40.606-18.179-40.606-40.606zM106.724 300.427c0-22.427 18.179-40.606 40.606-40.606 22.427 0 40.606 18.179 40.606 40.606 0 22.427-18.179 40.606-40.606 40.606-22.427 0-40.606-18.179-40.606-40.606zM775.59 726.022c-18.779 120.741-102.206 121.349-243.197 121.599-156.909 0.278-202.91 7.105-222.931-121.599L145.488 488.854c-1.113-56.179 19.344-97.228 19.344-97.228s21.993 57.759 154.763 57.759S532.392 295.36 532.392 295.36s98.177 154.025 212.798 154.025 154.763-57.759 154.763-57.759 19.344 40.685 19.344 96.266L775.59 726.022z m121.598-384.989c-22.427 0-40.606-18.179-40.606-40.606 0-22.427 18.179-40.606 40.606-40.606 22.427 0 40.606 18.179 40.606 40.606 0 22.427-18.179 40.606-40.606 40.606z" fill="#ffffff" /></svg>
     </div>
 
-    <div id="element_85366e983a2a4a9b">
+    <div id="main_section">
         <div id="element_3d30a70ff1c4447d">
             <div id="element_47cef1bcf40b47b7">
                 <canvas id="graph_canvas"></canvas>
@@ -205,12 +209,22 @@
         <div id="element_b53e0e1d5ebd48ae">
             <h2 id="element_7e557ad4033c45e2">Log Event</h2>
             <select id="event_type_dropdown">
-                <option id="element_858cce4c95524e10" value="period_start">period start</option>
-                <option id="element_0849c3d19e254d31" value="period_end">period end</option>
-                <option id="element_4693fc43131b4716" value="positive_pregnancy_test">positive pregnancy test</option>
-                <option id="element_9cfb296a35d9408c" value="miscarriage_start">miscarriage start</option>
-                <option id="element_5e845d77fbd34fcc" value="miscarriage_end">miscarriage end</option>
+                <option id="element_858cce4c95524e10" value="very_heavy_bleeding">very heavy bleeding</option>
+                <option id="element_0849c3d19e254d31" value="heavy_bleeding">heaving bleeding</option>
+                <option id="element_0849c3d19e254d31" value="medium_bleeding">medium bleeding</option>
+                <option id="element_0849c3d19e254d31" value="light_bleeding">light bleeding</option>
                 <option id="element_c4ebd0ed321341be" value="spotting">spotting</option>
+                <option id="element_4693fc43131b4716" value="positive_pregnancy_test">positive pregnancy test</option>
+                <option id="element_4693fc43131b4716" value="faintly_positive_pregnancy_test">faintly positive pregnancy test</option>
+                <option id="element_4693fc43131b4716" value="negative_pregnancy_test">negative pregnancy test</option>
+                <option id="element_4693fc43131b4716" value="fatigue">fatigue</option>
+                <option id="element_4693fc43131b4716" value="tender_breasts">tender breasts</option>
+                <option id="element_4693fc43131b4716" value="cramps">cramps</option>
+                <option id="element_4693fc43131b4716" value="positive_ovulation_test">positive ovulation test</option>
+                <option id="element_4693fc43131b4716" value="faintly_positive_ovulation_test">faintly positive ovulation test</option>
+                <option id="element_4693fc43131b4716" value="negative_ovulation_test">negative ovulation test</option>
+                <option id="element_4693fc43131b4716" value="sick">sick</option>
+                <option id="element_4693fc43131b4716" value="stress">stress</option>
             </select>
             <input id="event_date_select" class="date_select" type="date">
             <button id="submit_event" class="pink_border">Submit</button>
@@ -236,9 +250,10 @@
 
         let bb_temperatures = new Map();
         let events = new Map();
-        let START_DATE = new Date("2025-12-01");
-        let END_DATE = new Date("2026-3-01");
+        let START_DATE = new Date(2025, 12 - 1, 1);
+        let END_DATE = new Date(2026, 3 - 1, 1);
 
+        let event_type_dropdown = document.getElementById("event_type_dropdown");
         let submit_event = document.getElementById("submit_event");
         let submit_temp = document.getElementById("submit_temp");
         let graph_canvas = document.getElementById("graph_canvas");
@@ -248,11 +263,21 @@
         
         submit_event.addEventListener("click", () => {
 
+            // add to graph
+            const date = time_less_date_from_calendar(document.getElementById("event_date_select"));
+            events.set(
+                date_to_str(date),
+                event_type_dropdown.value
+            )
+            draw_graph(START_DATE, END_DATE, bb_temperatures, events);
+
+
+            // add to local storage
         });
         submit_temp.addEventListener("click", () => {
             
             const temp = parseFloat(document.getElementById("temp_input").value);
-            const date = new Date(document.getElementById("temp_date_select").value);
+            const date = time_less_date_from_calendar(document.getElementById("temp_date_select"));
             
 
             // add to graph
@@ -276,6 +301,11 @@
         function date_to_str(date) {
             const options = { month: 'numeric', day: 'numeric', year: 'numeric' };
             return new Intl.DateTimeFormat('en-US', options).format(date);
+        }
+    
+        function time_less_date_from_calendar(input) {
+            const [year, month, day] = input.value.split('-').map(Number);
+            return new Date(year, month - 1, day);
         }
     </script>
 
@@ -329,7 +359,7 @@
             let last_temp_x = 0;
 
             // walk through dates drawing
-            let curr_date = new Date(start_date.getTime());
+            let curr_date = new Date(start_date);
             let i = 0;
             while (curr_date < end_date) {
 
@@ -373,10 +403,46 @@
                     last_temp_y = y;
                 }
 
+                // draw events for this day
+                if (events.has(date_str)) {
+
+                    let type = events.get(date_str);
+                    if (type.includes("bleeding") || type.includes("spotting")) {
+
+                        let strength = 0.5;
+                        if (type == "very_heavy_bleeding") {
+                            strength = 0.5;
+                        }
+                        else if (type == "heavy_bleeding") {
+                            strength = 0.4;
+
+                        }
+                        else if (type == "medium_bleeding") {
+                            strength = 0.3;
+
+                        }
+                        else if (type == "light_bleeding") {
+                            strength = 0.2;
+                            
+                        }
+                        else if (type == "spotting") {
+                            strength = 0.1;
+                        }
+
+                        ctx.fillStyle = `rgba(224, 133, 215,${strength})`;
+                        ctx.fillRect(x, Y_MARGIN, step_x, graph_canvas.height - 2*Y_MARGIN);
+
+                    }
+
+                    // ctx.font = '20px Arial';
+                    // ctx.fillStyle = 'rgb(200, 200, 200)';
+                    // ctx.fillText(events.get(date_str), x + 5, 20);
+                }
 
                 i++;
                 curr_date.setDate(curr_date.getDate() + 1);
             }
+
 
         }
         draw_graph(START_DATE, END_DATE, bb_temperatures, events);
