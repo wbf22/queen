@@ -218,7 +218,7 @@
             <h2 id="element_7e557ad4033c45e2">Log Event</h2>
             <select id="event_type_dropdown">
                 <option id="element_858cce4c95524e10" value="very_heavy_bleeding">very heavy bleeding</option>
-                <option id="element_0849c3d19e254d31" value="heavy_bleeding">heaving bleeding</option>
+                <option id="element_0849c3d19e254d31" value="heavy_bleeding">heavy bleeding</option>
                 <option id="element_0849c3d19e254d31" value="medium_bleeding">medium bleeding</option>
                 <option id="element_0849c3d19e254d31" value="light_bleeding">light bleeding</option>
                 <option id="element_c4ebd0ed321341be" value="spotting">spotting</option>
@@ -255,398 +255,6 @@
 
 
 
-
-    <!-- general -->
-    <script>
-
-        let bb_temperatures = new Map();
-        let events = new Map();
-        let predictions = new Map();
-        let avg_period_duration = 5;
-        let avg_cycle_lenght = 28;
-        let avg_ovulation_symptoms_to_period_start = 14;
-        let avg_symptoms_to_period_start = 2;
-        let is_pregnant = false;
-
-        let priorities = new Map([
-            ["negative_pregnancy_test", 11],
-            ["positive_pregnancy_test", 10],
-            ["faintly_positive_pregnancy_test", 10],
-            ["positive_ovulation_test", 10],
-            ["faintly_positive_ovulation_test", 10],
-            ["negative_ovulation_test", 10],
-            ["very_heavy_bleeding", 9],
-            ["heavy_bleeding", 9],
-            ["medium_bleeding", 9],
-            ["light_bleeding", 9],
-            ["spotting", 8],
-            ["fatigue", 5],
-            ["tender_breasts", 5],
-            ["cramps", 5],
-            ["clearer_slippery_mucus", 5],
-            ["sticky_or_thicker_mucus", 5],
-            ["sick", 5],
-            ["stress", 5]
-        ]);
-
-        let START_DATE = new Date(2025, 12 - 1, 1);
-        let FONT_SIZE = 20;
-        let GRAPH_DAY_WIDTH_PIXELS = 11;
-
-        let event_type_dropdown = document.getElementById("event_type_dropdown");
-        let graph_canvas = document.getElementById("graph_canvas");
-        const ctx = graph_canvas.getContext('2d');
-
-
-        
-        function submit_event() {
-
-            // add to graph
-            const date = time_less_date_from_calendar(document.getElementById("event_date_select"));
-            const date_str = date_to_str(date);
-            add_to_list_map(events, date_str, event_type_dropdown.value);
-            draw_graph(START_DATE, bb_temperatures, events);
-
-            // add to local storage
-            local_storage_save("events", events);
-        }
-
-        function clear_events() {
-            // remove from graph
-            const date = time_less_date_from_calendar(document.getElementById("event_date_select"));
-            const date_str = date_to_str(date);
-            events.delete(date_str);
-            draw_graph(START_DATE, bb_temperatures, events);
-
-
-            // remove from local storage
-        }
-
-        function submit_temp() {
-            
-            const temp = parseFloat(document.getElementById("temp_input").value);
-            const date = time_less_date_from_calendar(document.getElementById("temp_date_select"));
-            
-
-            // add to graph
-            bb_temperatures.set(
-                date_to_str(date),
-                temp
-            );
-            draw_graph(START_DATE, bb_temperatures, events);
-
-            // add to local storage
-            local_storage_save("bb_temperatures", bb_temperatures);
-
-        }
-
-        function is_bleeding(event) {
-            return event == "very_heavy_bleeding" || event == "heavy_bleeding" || event == "medium_bleeding" || event == "light_bleeding";
-        }
-
-        function make_predictions(events, bb_temperatures) {
-            
-            /*
-                return:
-                - period predictions
-                - ovulation predictions
-                - pregnancy predictions
-
-
-                period
-                - look for bleeding
-                - use averages of period to period
-                - if fatigue, tender breats, or cramps; and near expected period, adjust using symptoms to period averages
-                
-
-                ovulation
-                - look for time until next period, and use past averages or 12-16 days before period
-                - rises in bb temperature over 3 days indicate ovulation has happened, adjust averages accordingly
-                - also clear slippery mucus also indicates ovulation, adjust averages accordinly
-
-                pregnancy
-                - prompt to take pregnancy test if period is very overdue ( like 2 cycles over )
-                - pregnant if positive pregnancy test
-                - pregnant if faint positive pregnancy test and period is overdue
-                - if pregnant:
-                    - mark conception date
-                    - mark expected due date, 280 days from first day of last period, or 266 days from ovulation date
-                    - show baby size
-                    - if positive pregnancy test with subsequent significant bleeding, cancel pregnancy if miscarriage and remove all these events
-            */
-
-            /*
-
-                1. scan events for periods (2 consecutive bleeding days)
-                    - also collect period symptoms to period start averages
-                2. ovulation
-                    - collect mucus symptoms or bb temp rises to next period start if within 10-18 days of next period
-                    - use those averages to set ovulation x days before predicted periods
-                3. pregnancy
-                    - pregnant if positive pregnancy test, or faint positive test and period is overdue by at least one cycle
-                    - mark conception date
-                    - mark due date 266 days from ovulation date
-                    - at week 15 show baby sizes (lower risk of miscarriage)
-                    - if positive pregnancy test with subsequent significant bleeding, cancel pregnancy if miscarriage and remove all these events
-            */
-
-            let predictions = new Map();
-            let period_durations = [5];
-            let cycle_lengths = [28];
-            let ovulation_symptoms_to_period_start = [14];
-            let symptoms_to_period_start = [2];
-
-            // periods
-            const events_list = Array.from(events.entries())
-                .sort((a, b) => new Date(a[0]) - new Date(b[0])); // sort by date
-
-            if (events_list.length > 0) {
-
-                // collect all events per day
-                let history_length_days = days_between(new Date(events_list[0][0]), new Date(events_list[events_list.length-1][0]));
-                let event_days = new Array(history_length_days).fill(null);
-                let start_date = new Date(events_list[0][0]);
-                for (let date_and_events of events_list) {
-                    let date_str = date_and_events[0];
-                    let events = date_and_events[1];
-
-                    for (let event of events) {
-                        let curr_date = new Date(date_str);
-                        let index = days_between(start_date, curr_date);
-                        let curr_event = event_days[index];
-                        if (!curr_event || priorities.get(event) > priorities.get(curr_event)) {
-                            event_days[index] = event;
-                        }
-                    }
-
-                }
-
-                // determine period lengths and cycle lengths
-                let last_period_start_index = null;
-                let current_period_start_index = null;
-                let positive_pregnancy_test = null;
-                let consecutive_bleeding = 0;
-                for (let i = 0; i < event_days.length; i++) {
-                    
-                    let event = event_days[i];
-                    if (event && is_bleeding(event)) {
-
-                        if (event == "very_heavy_bleeding" || event == "heavy_bleeding" || event == "medium_bleeding") {
-                            consecutive_bleeding++;
-                            if (positive_pregnancy_test) positive_pregnancy_test = null; // detected miscarriage
-                        }
-                        else if (event == "light_bleeding" && consecutive_bleeding > 2) {
-                            consecutive_bleeding++;
-                        }
-
-                        // period has started
-                        if (consecutive_bleeding == 3) {
-                            current_period_start_index = i-2;
-                            if (last_period_start_index) {
-                                cycle_lengths.push(current_period_start_index - last_period_start_index);
-                            }
-
-                            // look back for symptoms
-                            for (let j = i-7; j < i; j++) {
-                                if (j > 0 && (event_days[j] == "fatigue" || event_days[j] == "tender_breasts" || event_days[j] == "cramps")) {
-                                    symptoms_to_period_start.push(i-j);
-                                }
-                            }
-
-                            // look back for ovulation (and predict past ovulations)
-                            let ovulation_index = -1;
-                            for (let j = i-20; j < i; j++) {
-                                if (i > 0) {
-                                    let possible_ovulation = event_days[j] == "positive_ovulation_test" || 
-                                        event_days[j] == "faintly_positive_ovulation_test" || 
-                                        event_days == "clearer_slippery_mucus";
-                                    if (possible_ovulation) {
-                                        ovulation_symptoms_to_period_start.push(i-j);
-                                        ovulation_index = j;
-                                    }
-                                }
-                            }
-                            ovulation_index = ovulation_index != -1? ovulation_index : current_period_start_index - avg_ovulation_symptoms_to_period_start;
-                            for (let i = ovulation_index - 5; i < ovulation_index; i++) {
-                                let ovulation_date = get_date_plus_days(start_date, ovulation_index);
-                                predictions.set(date_to_str(period_date), "ovulation");
-                            }
-                            
-                        }
-                    }
-                    else {
-                        // period has ended
-                        if (consecutive_bleeding > 2){
-                            period_durations.push(consecutive_bleeding);
-                            last_period_start_index = current_period_start_index;
-                            current_period_start_index = null;
-                            consecutive_bleeding = 0;
-                        }
-
-                        if (event == "positive_pregnancy_test" || event == "faintly_positive_pregnancy_test") {
-                            positive_pregnancy_test = [i, event];
-                        }
-                        
-                        if (event == "negative_pregnancy_test") {
-                            positive_pregnancy_test = null;
-                        }
-                    }
-                }
-
-                if (last_period_start_index) last_period_start_index = 0;
-
-                // compute averages
-                avg_period_duration = future_favor_weighted_avg(period_durations);
-                avg_cycle_lenght = future_favor_weighted_avg(cycle_lengths);
-                avg_ovulation_symptoms_to_period_start = future_favor_weighted_avg(ovulation_symptoms_to_period_start);
-                avg_symptoms_to_period_start = future_favor_weighted_avg(symptoms_to_period_start);
-
-                // MAKE PREDICTIONS (periods, ovulations, if pregnant: conception, due date, if pregnant 15 weeks: baby sizes)
-                let curr_date = time_less_date_today();
-                let last_period_date = get_date_plus_days(start_date, );
-                let days_since_last_period = event_days.length - last_period_start_index;
-                let days_until_next_period = Math.min(avg_cycle_lenght - days_since_last_period, 0);
-
-                // if recent symptoms and period soon
-                if (days_until_next_period < 7) {
-                    for (let i = event_days.length-1; i > event_days.length-5; i--) {
-                        if (event_days[i] == "fatigue" || event_days[i] == "tender_breasts" || event_days[i] == "cramps") {
-                            days_until_next_period = (i - event_days.length) + avg_symptoms_to_period_start; 
-                            days_until_next_period = Math.max(days_until_next_period, 0);
-                            break;
-                        }
-                    }
-                }
-
-                // if recent symptoms and ovulation soon (12-16 days before period)
-                if (days_until_next_period > 12 && days_until_next_period < 20) {
-                    for (let i = event_days.length-1; i > event_days.length-5; i--) {
-                        if (
-                            event_days[i] == "positive_ovulation_test" || 
-                            event_days[i] == "faintly_positive_ovulation_test" || 
-                            event_days[i] == "clearer_slippery_mucus"
-                        ) {
-                            days_until_next_period = (i - event_days.length) + avg_ovulation_symptoms_to_period_start; 
-                            days_until_next_period = Math.max(days_until_next_period, 0);
-                            break;
-                        }
-                    }
-                }
-
-                let next_period_date = get_date_plus_days(curr_date, days_until_next_period);
-
-                // if ovulation before next period
-                if (days_until_next_period > avg_ovulation_symptoms_to_period_start) {
-                    let days_until_ovulation_start = days_until_next_period - avg_ovulation_symptoms_to_period_start;
-                    for (let i = days_until_ovulation_start - 5; i < days_until_ovulation_start; i++) {
-                        let ovulation_date = get_date_plus_days(curr_date, ovulation_date);
-                        predictions.set(date_to_str(period_date), "ovulation");
-                    }
-                }
-
-                // predict out periods and ovulations for the next 10 cycles
-                for (let p = 0; p < 10; p++) {
-                    
-                    // period
-                    let period_date = new Date(next_period_date);
-                    period_date.setDate(period_date.getDate() + p * avg_cycle_lenght);
-                    for (let i = 0; i < avg_period_duration; i++) {
-                        predictions.set(date_to_str(period_date), "period");
-                        period_date.setDate(period_date.getDate()+1);
-                    }
-
-                    // ovulation
-                    let days_until_ovulation_start = days_until_next_period + p * avg_cycle_lenght - avg_ovulation_symptoms_to_period_start;
-                    for (let i = days_until_ovulation_start - 5; i < days_until_ovulation_start; i++) {
-                        let ovulation_date = get_date_plus_days(curr_date, days_until_ovulation_start);
-                        predictions.set(date_to_str(ovulation_date), "ovulation");
-                    }
-                }
-
-
-                // pregnancy pridictions
-                let cycles_overdue = (event_days.length - last_period_start_index) / avg_cycle_lenght;
-                if (cycles_overdue > 2 && local_storage_get("take_pregnancy_test_shown") != date_to_str(curr_date)) {
-                    local_storage_save("take_pregnancy_test_shown", date_to_str(curr_date));
-                    alert("Hey it looks like it's been a while since your last period. Might be good to take a pregnancy test if it's possible you're pregnant.");
-                }
-
-                // determine if pregnant
-                if (positive_pregnancy_test) {
-                    let index = positive_pregnancy_test[0];
-                    let test_event = positive_pregnancy_test[1];
-                    
-                    let days_since_last_period = index - last_period_start_index;
-
-                    if (test_event == "positive_pregnancy_test") {
-                        is_pregnant == true;
-                    }
-                    else if (test_event == "faintly_positive_pregnancy_test" && days_since_last_period > avg_cycle_lenght * 1.5) {
-                        is_pregnant == true;
-                    }
-                }
-                if (is_pregnant) {
-                    /*
-
-                        pregnancy
-                        - prompt to take pregnancy test if period is very overdue ( like 2 cycles over )
-                        - pregnant if positive pregnancy test
-                        - pregnant if faint positive pregnancy test and period is overdue
-                        - if pregnant:
-                            - mark conception date
-                            - mark expected due date, 280 days from first day of last period, or 266 days from ovulation date
-                            - show baby size
-                            - if positive pregnancy test with subsequent significant bleeding, cancel pregnancy if miscarriage and remove all these events
-                    */
-
-                    // mark conception date
-                    let index = positive_pregnancy_test[0];
-                    let test_event = positive_pregnancy_test[1];
-                    while (index > 0) {
-                        let search_date = get_date_plus_days(start_date, index);
-                        if (predictions.has(date_to_str(search_date))) {
-                            break;
-                        }
-                        index--;
-                    }
-                    let conception_date = get_date_plus_days(start_date, index);
-                    predictions.set(date_to_str(conception_date), "conception_date")
-
-
-                    // mark expected due date
-                    let due_date = get_date_plus_days(conception_date, 266);
-
-                    // baby sizes if over 15 weeks
-                    if (index > 15*7) {
-                        let week15 = get_date_plus_days(conception_date, 15*7);
-                        let week20 = get_date_plus_days(conception_date, 20*7);
-                        let week25 = get_date_plus_days(conception_date, 25*7);
-                        let week30 = get_date_plus_days(conception_date, 30*7);
-                        let week35 = get_date_plus_days(conception_date, 35*7);
-                        let week40 = get_date_plus_days(conception_date, 40*7);
-
-                        predictions.set(week15, "baby is a 🍎");
-                        predictions.set(week20, "baby is a 🍌");
-                        predictions.set(week25, "baby is a 🍈");
-                        predictions.set(week30, "baby is a 🍆");
-                        predictions.set(week35, "baby is a 🍍");
-                        predictions.set(week40, "baby is a 🏀");
-                    }
-
-                    
-                    
-                }
-
-                
-            }
-
-        }
-
-
-
-    </script>
-
-
     <!-- util -->
     <script>
         function date_to_str(date) {
@@ -661,7 +269,7 @@
 
         function time_less_date_today() {
             const now = new Date();
-            return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+            return new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
         }
     
         function add_to_list_map(map, key, value) {
@@ -728,12 +336,423 @@
     </script>
 
 
+    <!-- general -->
+    <script>
+
+        let bb_temperatures = new Map();
+        let events = new Map();
+        let predictions = new Map();
+        let avg_period_duration = 5;
+        let avg_cycle_lenght = 28;
+        let avg_ovulation_symptoms_to_period_start = 14;
+        let avg_symptoms_to_period_start = 2;
+        let is_pregnant = false;
+
+        let priorities = new Map([
+            ["negative_pregnancy_test", 11],
+            ["positive_pregnancy_test", 10],
+            ["faintly_positive_pregnancy_test", 10],
+            ["positive_ovulation_test", 10],
+            ["faintly_positive_ovulation_test", 10],
+            ["negative_ovulation_test", 10],
+            ["very_heavy_bleeding", 9],
+            ["heavy_bleeding", 9],
+            ["medium_bleeding", 9],
+            ["light_bleeding", 9],
+            ["spotting", 8],
+            ["fatigue", 5],
+            ["tender_breasts", 5],
+            ["cramps", 5],
+            ["clearer_slippery_mucus", 5],
+            ["sticky_or_thicker_mucus", 5],
+            ["sick", 5],
+            ["stress", 5]
+        ]);
+
+        let START_DATE = get_date_plus_days(time_less_date_today(), -20);
+        let FONT_SIZE = 20;
+        let GRAPH_DAY_WIDTH_PIXELS = 11;
+
+        let event_type_dropdown = document.getElementById("event_type_dropdown");
+        let graph_canvas = document.getElementById("graph_canvas");
+        const ctx = graph_canvas.getContext('2d');
+
+
+        
+        function submit_event() {
+
+            // add to graph
+            const date = time_less_date_from_calendar(document.getElementById("event_date_select"));
+            const date_str = date_to_str(date);
+            add_to_list_map(events, date_str, event_type_dropdown.value);
+            make_predictions(events, bb_temperatures);
+            draw_graph(START_DATE, bb_temperatures, events);
+
+            // add to local storage
+            local_storage_save("events", events);
+        }
+
+        function clear_events() {
+            // remove from graph
+            const date = time_less_date_from_calendar(document.getElementById("event_date_select"));
+            const date_str = date_to_str(date);
+            events.delete(date_str);
+            draw_graph(START_DATE, bb_temperatures, events);
+
+
+            // remove from local storage
+            local_storage_save("events", events);
+            local_storage_save("bb_temperatures", bb_temperatures);
+        }
+
+        function submit_temp() {
+            
+            const temp = parseFloat(document.getElementById("temp_input").value);
+            const date = time_less_date_from_calendar(document.getElementById("temp_date_select"));
+            
+
+            // add to graph
+            bb_temperatures.set(
+                date_to_str(date),
+                temp
+            );
+            make_predictions(events, bb_temperatures);
+            draw_graph(START_DATE, bb_temperatures, events);
+
+            // add to local storage
+            local_storage_save("bb_temperatures", bb_temperatures);
+
+        }
+
+        function is_bleeding(event) {
+            return event == "very_heavy_bleeding" || event == "heavy_bleeding" || event == "medium_bleeding" || event == "light_bleeding";
+        }
+
+
+        function mark_out_ovulation_days(start_date, ovulation_index) {
+            for (let o = ovulation_index - 5; o < ovulation_index; o++) {
+                let ovulation_date = get_date_plus_days(start_date, o);
+                predictions.set(date_to_str(ovulation_date), "ovulation");
+                if (o == ovulation_index-5) {
+                    predictions.set(date_to_str(ovulation_date), "ovulation_start");
+                }
+            }
+            let ovulation_date = get_date_plus_days(start_date, ovulation_index);
+            predictions.set(date_to_str(ovulation_date), "ovulation_end");
+        }
+
+        function make_predictions(events, bb_temperatures) {
+            
+            /*
+                return:
+                - period predictions
+                - ovulation predictions
+                - pregnancy predictions
+
+
+                period
+                - look for bleeding
+                - use averages of period to period
+                - if fatigue, tender breats, or cramps; and near expected period, adjust using symptoms to period averages
+                
+
+                ovulation
+                - look for time until next period, and use past averages or 12-16 days before period
+                - rises in bb temperature over 3 days indicate ovulation has happened, adjust averages accordingly
+                - also clear slippery mucus also indicates ovulation, adjust averages accordinly
+
+                pregnancy
+                - prompt to take pregnancy test if period is very overdue ( like 2 cycles over )
+                - pregnant if positive pregnancy test
+                - pregnant if faint positive pregnancy test and period is overdue
+                - if pregnant:
+                    - mark conception date
+                    - mark expected due date, 280 days from first day of last period, or 266 days from ovulation date
+                    - show baby size
+                    - if positive pregnancy test with subsequent significant bleeding, cancel pregnancy if miscarriage and remove all these events
+            */
+
+            /*
+
+                1. scan events for periods (2 consecutive bleeding days)
+                    - also collect period symptoms to period start averages
+                2. ovulation
+                    - collect mucus symptoms or bb temp rises to next period start if within 10-18 days of next period
+                    - use those averages to set ovulation x days before predicted periods
+                3. pregnancy
+                    - pregnant if positive pregnancy test, or faint positive test and period is overdue by at least one cycle
+                    - mark conception date
+                    - mark due date 266 days from ovulation date
+                    - at week 15 show baby sizes (lower risk of miscarriage)
+                    - if positive pregnancy test with subsequent significant bleeding, cancel pregnancy if miscarriage and remove all these events
+            */
+
+            predictions = new Map();
+            let period_durations = [5];
+            let cycle_lengths = [28];
+            let ovulation_symptoms_to_period_start = [14];
+            let symptoms_to_period_start = [2];
+
+            // periods
+            const events_list = Array.from(events.entries())
+                .sort((a, b) => new Date(a[0]) - new Date(b[0])); // sort by date
+
+            if (events_list.length > 0) {
+                let curr_date = time_less_date_today();
+
+                // collect all events per day
+                let history_length_days = days_between(new Date(events_list[0][0]), curr_date);
+                let event_days = new Array(history_length_days).fill(null);
+                let start_date = new Date(events_list[0][0]);
+                for (let date_and_events of events_list) {
+                    let date_str = date_and_events[0];
+                    let events = date_and_events[1];
+
+                    for (let event of events) {
+                        let curr_date = new Date(date_str);
+                        let index = days_between(start_date, curr_date);
+                        let curr_event = event_days[index];
+                        if (!curr_event || priorities.get(event) > priorities.get(curr_event)) {
+                            event_days[index] = event;
+                        }
+                    }
+
+                }
+
+                // determine period lengths and cycle lengths
+                let last_period_start_index = null;
+                let current_period_start_index = null;
+                let positive_pregnancy_test = null;
+                let consecutive_bleeding = 0;
+                for (let i = 0; i < event_days.length; i++) {
+                    
+                    let event = event_days[i];
+                    if (event && is_bleeding(event)) {
+
+                        if (event == "very_heavy_bleeding" || event == "heavy_bleeding" || event == "medium_bleeding") {
+                            consecutive_bleeding++;
+                            if (positive_pregnancy_test) positive_pregnancy_test = null; // detected miscarriage
+                        }
+                        else if (event == "light_bleeding" && consecutive_bleeding > 1) {
+                            consecutive_bleeding++;
+                        }
+
+                        // period has started
+                        if (consecutive_bleeding == 2) {
+                            current_period_start_index = i-1;
+                            if (last_period_start_index) {
+                                cycle_lengths.push(current_period_start_index - last_period_start_index);
+                            }
+
+                            // look back for symptoms
+                            for (let j = i-7; j < i; j++) {
+                                if (j > 0 && (event_days[j] == "fatigue" || event_days[j] == "tender_breasts" || event_days[j] == "cramps")) {
+                                    symptoms_to_period_start.push(i-j);
+                                }
+                            }
+
+                            // look back for ovulation (and predict past ovulations)
+                            let ovulation_index = -1;
+                            for (let j = i-20; j < i; j++) {
+                                if (i > 0) {
+                                    let possible_ovulation = event_days[j] == "positive_ovulation_test" || 
+                                        event_days[j] == "faintly_positive_ovulation_test" || 
+                                        event_days == "clearer_slippery_mucus";
+                                    if (possible_ovulation) {
+                                        ovulation_symptoms_to_period_start.push(i-j);
+                                        ovulation_index = j;
+                                    }
+                                }
+                            }
+                            ovulation_index = ovulation_index != -1? ovulation_index : current_period_start_index - avg_ovulation_symptoms_to_period_start;
+                            mark_out_ovulation_days(start_date, ovulation_index);
+                            
+                        }
+                    }
+                    else {
+                        // period has ended
+                        if (consecutive_bleeding > 2){
+                            period_durations.push(consecutive_bleeding);
+                            last_period_start_index = current_period_start_index;
+                            current_period_start_index = null;
+                            consecutive_bleeding = 0;
+                        }
+
+                        if (event == "positive_pregnancy_test" || event == "faintly_positive_pregnancy_test") {
+                            positive_pregnancy_test = [i, event];
+                        }
+                        
+                        if (event == "negative_pregnancy_test") {
+                            positive_pregnancy_test = null;
+                        }
+                    }
+                }
+
+                if (!last_period_start_index) last_period_start_index = 0;
+
+                // compute averages
+                avg_period_duration = future_favor_weighted_avg(period_durations);
+                avg_cycle_lenght = future_favor_weighted_avg(cycle_lengths);
+                avg_ovulation_symptoms_to_period_start = future_favor_weighted_avg(ovulation_symptoms_to_period_start);
+                avg_symptoms_to_period_start = future_favor_weighted_avg(symptoms_to_period_start);
+
+                // MAKE PREDICTIONS (periods, ovulations, if pregnant: conception, due date, if pregnant 15 weeks: baby sizes)
+                let last_period_date = get_date_plus_days(start_date, last_period_start_index);
+                let days_since_last_period = event_days.length - last_period_start_index;
+                let days_until_next_period = Math.max(avg_cycle_lenght - days_since_last_period, 0);
+
+
+                // determine if pregnant
+                if (positive_pregnancy_test) {
+                    let index = positive_pregnancy_test[0];
+                    let test_event = positive_pregnancy_test[1];
+
+                    if (test_event == "positive_pregnancy_test") {
+                        is_pregnant = true;
+                    }
+                    else if (test_event == "faintly_positive_pregnancy_test" && days_since_last_period > avg_cycle_lenght * 1.5) {
+                        is_pregnant = true;
+                    }
+                }
+
+                // if ovulation before next period
+                if (days_since_last_period > avg_ovulation_symptoms_to_period_start) {
+                    let days_until_ovulation = days_until_next_period - avg_ovulation_symptoms_to_period_start;
+                    mark_out_ovulation_days(curr_date, days_until_ovulation);
+                }
+
+                if (!is_pregnant) {
+
+
+                    let cycles_overdue = (event_days.length - last_period_start_index) / avg_cycle_lenght;
+                    if (cycles_overdue > 2 && local_storage_get("take_pregnancy_test_shown") != date_to_str(curr_date)) {
+                        local_storage_save("take_pregnancy_test_shown", date_to_str(curr_date));
+                        alert("Hey it looks like it's been a while since your last period. Might be good to take a pregnancy test if it's possible you're pregnant.");
+                    }
+
+
+                    // if recent symptoms and period soon
+                    if (days_until_next_period < 7) {
+                        for (let i = event_days.length-1; i > event_days.length-5; i--) {
+                            if (event_days[i] == "fatigue" || event_days[i] == "tender_breasts" || event_days[i] == "cramps") {
+                                days_until_next_period = (i - event_days.length) + avg_symptoms_to_period_start; 
+                                days_until_next_period = Math.max(days_until_next_period, 0);
+                                break;
+                            }
+                        }
+                    }
+
+                    // if recent symptoms and ovulation soon (12-16 days before period)
+                    if (days_until_next_period > 12 && days_until_next_period < 20) {
+                        for (let i = event_days.length-1; i > event_days.length-5; i--) {
+                            if (
+                                event_days[i] == "positive_ovulation_test" || 
+                                event_days[i] == "faintly_positive_ovulation_test" || 
+                                event_days[i] == "clearer_slippery_mucus"
+                            ) {
+                                days_until_next_period = (i - event_days.length) + avg_ovulation_symptoms_to_period_start; 
+                                days_until_next_period = Math.max(days_until_next_period, 0);
+                                break;
+                            }
+                        }
+                    }
+
+                    let next_period_date = get_date_plus_days(curr_date, days_until_next_period);
+
+                    // predict out periods and ovulations for the next 10 cycles
+                    for (let p = 0; p < 10; p++) {
+                        
+                        // period
+                        let period_date = new Date(next_period_date);
+                        period_date.setDate(period_date.getDate() + p * avg_cycle_lenght);
+                        for (let i = 0; i < avg_period_duration; i++) {
+                            predictions.set(date_to_str(period_date), "period");
+                            period_date.setDate(period_date.getDate()+1);
+                            if (i == days_until_ovulation_start-5) {
+                                predictions.set(date_to_str(ovulation_date), "period_start");
+                            }
+                            else if (i == days_until_ovulation_start) {
+                                predictions.set(date_to_str(ovulation_date), "period_end");
+                            }
+                        }
+
+                        // ovulation
+                        let days_until_ovulation = days_until_next_period + p * avg_cycle_lenght - avg_ovulation_symptoms_to_period_start;
+                        mark_out_ovulation_days(curr_date, days_until_ovulation);
+                    }
+                }
+                
+                
+                // pregnancy pridictions
+                if (is_pregnant) {
+                    /*
+
+                        pregnancy
+                        - prompt to take pregnancy test if period is very overdue ( like 2 cycles over )
+                        - pregnant if positive pregnancy test
+                        - pregnant if faint positive pregnancy test and period is overdue
+                        - if pregnant:
+                            - mark conception date
+                            - mark expected due date, 280 days from first day of last period, or 266 days from ovulation date
+                            - show baby size
+                            - if positive pregnancy test with subsequent significant bleeding, cancel pregnancy if miscarriage and remove all these events
+                    */
+
+                    // mark conception date
+                    let index = positive_pregnancy_test[0];
+                    let test_event = positive_pregnancy_test[1];
+                    while (index > 0) {
+                        let search_date = get_date_plus_days(start_date, index);
+                        if (predictions.has(date_to_str(search_date)) && predictions.get(date_to_str(search_date)).includes("ovulation")) {
+                            break;
+                        }
+                        index--;
+                    }
+                    let conception_date = get_date_plus_days(start_date, index);
+                    predictions.set(date_to_str(conception_date), "conception_date")
+
+
+                    // mark expected due date
+                    let due_date = get_date_plus_days(conception_date, 266);
+                    predictions.set(date_to_str(due_date), "due_date")
+
+                    // baby sizes if over 15 weeks
+                    if (index > 15*7) {
+                        let week15 = get_date_plus_days(conception_date, 15*7);
+                        let week20 = get_date_plus_days(conception_date, 20*7);
+                        let week25 = get_date_plus_days(conception_date, 25*7);
+                        let week30 = get_date_plus_days(conception_date, 30*7);
+                        let week35 = get_date_plus_days(conception_date, 35*7);
+                        let week40 = get_date_plus_days(conception_date, 40*7);
+
+                        predictions.set(week15, "baby is a 🍎");
+                        predictions.set(week20, "baby is a 🍌");
+                        predictions.set(week25, "baby is a 🍈");
+                        predictions.set(week30, "baby is a 🍆");
+                        predictions.set(week35, "baby is a 🍍");
+                        predictions.set(week40, "baby is a 🏀");
+                    }
+
+                    
+                    
+                }
+
+                
+            }
+
+        }
+
+
+
+    </script>
+
+
     <!-- graph -->
     <script>
         let Y_MARGIN = 40;
         let text_positions = [0, 3, 8, 6, 2, 4, 7, 1, 5, 20, 15, 9, 11, 19, 12, 18, 14, 16, 12, 17, 13, 10, 15];
         let text_i = 0;
-        function draw_flag(ctx, text, x, color, background_color) {
+        function draw_flag(ctx, text, x, color, background_color, is_dashed) {
 
             // determine flag position
             let max_text_pos = (graph_canvas.height - 2*Y_MARGIN) / FONT_SIZE;
@@ -742,8 +761,16 @@
             
 
             // draw line
-            ctx.fillStyle = color;
-            ctx.fillRect(x, y_text, 1, graph_canvas.height - y_text - Y_MARGIN);
+            ctx.beginPath();
+            if (is_dashed) {
+                ctx.setLineDash([5, 5]);
+            }
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 1;
+            ctx.moveTo(x, y_text);
+            ctx.lineTo(x, graph_canvas.height - Y_MARGIN);
+            ctx.stroke();
+            ctx.setLineDash([]);    
 
             // draw text with background
             ctx.font = `${FONT_SIZE}px Arial`;
@@ -883,66 +910,66 @@
                         }
 
                         if (type == "positive_pregnancy_test" || type == "faintly_positive_pregnancy_test") {
-                            let text = curr_date.getDate() + (type == "positive_pregnancy_test"? " positive pregnancy test" : " faint pregnancy test");
-                            let color = type == "positive_pregnancy_test"? "rgba(97, 250, 179, 1.0)" : "rgba(136, 252, 224, 1.0)";
-                            let background_color = type == "positive_pregnancy_test"? "rgba(97, 250, 179, 0.3)" : "rgba(136, 252, 224, 0.3)";
-                            draw_flag(ctx, text, x, color, background_color);
+                            let text = curr_date.getDate() + (type == "positive_pregnancy_test"? " positive pregnancy test 👑" : " faint pregnancy test");
+                            let color = type == "positive_pregnancy_test"? "rgba(219, 33, 117, 1.0)" : "rgba(219, 33, 117, 1.0)";
+                            let background_color = type == "positive_pregnancy_test"? "rgba(219, 33, 117, 0.3)" : "rgba(219, 33, 117, 0.3)";
+                            draw_flag(ctx, text, x, color, background_color, false);
                         }
                         
                         if (type == "negative_pregnancy_test") {
                             let text = curr_date.getDate() + " negative pregnancy test";
                             let color = "rgba(110, 57, 0, 1.0)";
                             let background_color = "rgba(110, 57, 0, 0.3)";
-                            draw_flag(ctx, text, x, color, background_color);
+                            draw_flag(ctx, text, x, color, background_color, false);
                         }
                         
                         if (type == "fatigue") {
                             let text = curr_date.getDate() + " fatigue";
                             let color = "rgba(162, 39, 219, 1.0)";
                             let background_color = "rgba(162, 39, 219, 0.3)";
-                            draw_flag(ctx, text, x, color, background_color);
+                            draw_flag(ctx, text, x, color, background_color, false);
                         }
 
                         if (type == "tender_breasts") {
                             let text = curr_date.getDate() + " tender_breasts";
                             let color = "rgba(162, 39, 219, 1.0)";
                             let background_color = "rgba(162, 39, 219, 0.3)";
-                            draw_flag(ctx, text, x, color, background_color);
+                            draw_flag(ctx, text, x, color, background_color, false);
                         }
 
                         if (type == "clearer_slippery_mucus") {
                             let text = curr_date.getDate() + " clearer slippery mucus";
-                            let color = "rgba(62, 191, 214, 1.0)";
-                            let background_color = "rgba(62, 191, 214, 0.3)";
-                            draw_flag(ctx, text, x, color, background_color);
+                            let color = "rgba(97, 250, 179, 1.0)";
+                            let background_color = "rgba(97, 250, 179, 0.3)";
+                            draw_flag(ctx, text, x, color, background_color, false);
                         }
 
                         if (type == "sticky_or_thicker_mucus") {
                             let text = curr_date.getDate() + " sticky or thicker mucus";
                             let color = "rgba(62, 191, 214, 1.0)";
                             let background_color = "rgba(62, 191, 214, 0.3)";
-                            draw_flag(ctx, text, x, color, background_color);
+                            draw_flag(ctx, text, x, color, background_color, false);
                         }
 
                         if (type == "cramps") {
                             let text = curr_date.getDate() + " cramps";
                             let color = "rgba(162, 39, 219, 1.0)";
                             let background_color = "rgba(162, 39, 219, 0.3)";
-                            draw_flag(ctx, text, x, color, background_color);
+                            draw_flag(ctx, text, x, color, background_color, false);
                         }
 
                         if (type == "positive_ovulation_test" || type == "faintly_positive_ovulation_test") {
                             let text = curr_date.getDate() + (type == "positive_ovulation_test"? " positive ovulation test" : " faint ovulation test");
                             let color = type == "positive_ovulation_test"? "rgba(219, 33, 117, 1.0)" : "rgba(204, 65, 128, 1.0)";
                             let background_color = type == "positive_ovulation_test"? "rgba(219, 33, 117, 0.3)" : "rgba(204, 65, 128, 0.3)";
-                            draw_flag(ctx, text, x, color, background_color);
+                            draw_flag(ctx, text, x, color, background_color, false);
                         }
                         
                         if (type == "negative_ovulation_test") {
                             let text = curr_date.getDate() + " negative ovulation test";
                             let color = "rgba(110, 57, 0, 1.0)";
                             let background_color = "rgba(110, 57, 0, 0.3)";
-                            draw_flag(ctx, text, x, color, background_color);
+                            draw_flag(ctx, text, x, color, background_color, false);
                         }
 
                         if (type == "sick" || type == "stress") {
@@ -953,6 +980,100 @@
 
                     }
                     
+                }
+
+                // draw predications for this day
+                if (predictions.has(date_str)) {
+                    let prediction = predictions.get(date_str);
+                    if (prediction == "ovulation_start") {
+                        let text = "" + curr_date.getDate();
+                        let color = "rgba(97, 250, 179, 1.0)";
+                        let background_color = "rgba(97, 250, 179, 0.3)";
+                        draw_flag(ctx, text, x, color, background_color, true);
+
+                        ctx.beginPath();
+                        ctx.setLineDash([5, 5]);
+                        ctx.lineWidth = 1;
+                        ctx.strokeStyle = color;
+
+                        // up down line
+                        ctx.moveTo(x, Y_MARGIN);
+                        ctx.lineTo(x, graph_canvas.height - Y_MARGIN);
+                        ctx.stroke();
+
+                        // top bottom lines
+                        ctx.moveTo(x, Y_MARGIN);
+                        ctx.lineTo(x + step_x, Y_MARGIN);
+                        ctx.stroke();
+                        ctx.moveTo(x, graph_canvas.height - Y_MARGIN);
+                        ctx.lineTo(x + step_x, graph_canvas.height - Y_MARGIN);
+                        ctx.stroke();
+
+                        ctx.setLineDash([]); 
+
+
+                    }
+                    else if (prediction == "ovulation") {
+                        let color = "rgba(97, 250, 179, 1.0)";
+                        ctx.beginPath();
+                        ctx.setLineDash([5, 5]);
+                        ctx.lineWidth = 1;
+                        ctx.strokeStyle = color;
+
+                        // top bottom lines
+                        ctx.moveTo(x, Y_MARGIN);
+                        ctx.lineTo(x + step_x, Y_MARGIN);
+                        ctx.stroke();
+                        ctx.moveTo(x, graph_canvas.height - Y_MARGIN);
+                        ctx.lineTo(x + step_x, graph_canvas.height - Y_MARGIN);
+                        ctx.stroke();
+
+                        ctx.setLineDash([]); 
+
+                    }
+                    else if (prediction == "ovulation_end" || prediction == "conception_date") {
+                        let text = curr_date.getDate() + " ovulation";
+                        let color = "rgba(97, 250, 179, 1.0)";
+                        let background_color = "rgba(97, 250, 179, 0.3)";
+                        draw_flag(ctx, text, x + step_x, color, background_color, true);
+
+                        ctx.beginPath();
+                        ctx.setLineDash([5, 5]);
+                        ctx.lineWidth = 1;
+                        ctx.strokeStyle = color;
+
+                        // up down line
+                        ctx.moveTo(x + step_x, Y_MARGIN);
+                        ctx.lineTo(x + step_x, graph_canvas.height - Y_MARGIN);
+                        ctx.stroke();
+
+                        // top bottom lines
+                        ctx.moveTo(x, Y_MARGIN);
+                        ctx.lineTo(x + step_x, Y_MARGIN);
+                        ctx.stroke();
+                        ctx.moveTo(x, graph_canvas.height - Y_MARGIN);
+                        ctx.lineTo(x + step_x, graph_canvas.height - Y_MARGIN);
+                        ctx.stroke();
+
+                        ctx.setLineDash([]); 
+
+                    }
+                    else if (prediction == "due_date") {
+
+                    }
+                    else if (prediction == "period_start") {
+
+                    }
+                    else if (prediction == "period") {
+
+                    }
+                    else if (prediction == "period_end") {
+
+                    }
+                    // baby size
+                    else {
+
+                    }
                 }
 
                 i++;
@@ -1030,10 +1151,11 @@
         
         // startup
         events = local_storage_get("events");
-        if (!events) events = new Map();
+        if (!events || bb_temperatures.length == 0) events = new Map();
         bb_temperatures = local_storage_get("bb_temperatures");
-        if (!bb_temperatures) bb_temperatures = new Map();
-        draw_graph(START_DATE, bb_temperatures, events);
+        if (!bb_temperatures || bb_temperatures.length == 0) bb_temperatures = new Map();
+        make_predictions(events, bb_temperatures);
+        draw_graph(START_DATE, bb_temperatures, events, predictions);
 
     </script>
 
