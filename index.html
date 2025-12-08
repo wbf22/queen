@@ -761,12 +761,14 @@
     <!-- graph -->
     <script>
         let Y_MARGIN = 40;
+        let Y_MARGIN_TOP = 80;
+        let BB_MARGIN = 20;
         let text_positions = [0, 3, 8, 6, 2, 4, 7, 1, 5, 20, 15, 9, 11, 19, 12, 18, 14, 16, 12, 17, 13, 10, 15];
         let text_i = 0;
         function draw_flag(ctx, text, x, color, background_color, is_dashed) {
 
             // determine flag position
-            let max_text_pos = (graph_canvas.height - 2*Y_MARGIN) / FONT_SIZE;
+            let max_text_pos = (graph_canvas.height - Y_MARGIN - Y_MARGIN_TOP) / FONT_SIZE;
             let text_pos = text_positions[text_i] < max_text_pos? text_positions[text_i] : text_positions[text_i] % Math.floor(max_text_pos);
             let y_text = Y_MARGIN + FONT_SIZE*text_pos;
             
@@ -779,7 +781,7 @@
             ctx.strokeStyle = color;
             ctx.lineWidth = 1;
             ctx.moveTo(x, y_text);
-            ctx.lineTo(x, graph_canvas.height - Y_MARGIN);
+            ctx.lineTo(x, graph_canvas.height - Y_MARGIN_TOP);
             ctx.stroke();
             ctx.setLineDash([]);    
 
@@ -821,7 +823,9 @@
             }
             max_temp = min_temp == max_temp? min_temp + 2 : max_temp;
             Y_MARGIN = graph_canvas.height * .2;
-            const step_y = (graph_canvas.height - 2*Y_MARGIN) / (max_temp-min_temp);
+            Y_MARGIN_TOP = graph_canvas.height * .4;
+            BB_MARGIN = graph_canvas.height * .1;
+            const step_y = (Y_MARGIN_TOP - BB_MARGIN) / (max_temp-min_temp);
 
             // determine last temp
             let last_date = null;
@@ -847,8 +851,16 @@
             let i = 0;
             while (curr_date < end_date) {
 
-                // draw line if 1st day of the month
+                // draw gird lines
                 let x = step_x * i;
+                if (curr_date.getDate() == 1) {
+
+                    const options = { month: 'short', year: 'numeric' };
+                    const formatted = new Intl.DateTimeFormat('en-US', options).format(curr_date);
+                    ctx.font = `${FONT_SIZE}px Arial`;
+                    ctx.fillStyle = 'rgb(200, 200, 200)';
+                    ctx.fillText(formatted, x + 5, graph_canvas.height - 20);
+                }
                 if (curr_date.getDate() == 1) {
     
                     ctx.beginPath();
@@ -858,18 +870,13 @@
                     ctx.lineWidth = 1;
                     ctx.stroke();
 
-                    const options = { month: 'short', year: 'numeric' };
-                    const formatted = new Intl.DateTimeFormat('en-US', options).format(curr_date);
-                    ctx.font = `${FONT_SIZE}px Arial`;
-                    ctx.fillStyle = 'rgb(200, 200, 200)';
-                    ctx.fillText(formatted, x + 5, graph_canvas.height - 20);
                 }
 
                 // draw temperature for this day
                 const date_str = date_to_str(curr_date);
                 if (bb_temperatures.has(date_str)) {
                     let temp = bb_temperatures.get(date_str);
-                    let y = graph_canvas.height - Y_MARGIN - step_y * (temp - min_temp);
+                    let y = graph_canvas.height - BB_MARGIN - step_y * (temp - min_temp);
                     ctx.beginPath();
                     ctx.arc(x, y, 2.5, 0, Math.PI * 2); // full circle
                     ctx.fillStyle = 'rgb(224, 133, 215)'; // color of the dot
@@ -916,7 +923,7 @@
                             }
 
                             ctx.fillStyle = `rgba(224, 133, 215,${strength})`;
-                            ctx.fillRect(x, Y_MARGIN, step_x, graph_canvas.height - 2*Y_MARGIN);
+                            ctx.fillRect(x, Y_MARGIN, step_x, graph_canvas.height - Y_MARGIN - Y_MARGIN_TOP);
 
                         }
 
@@ -985,7 +992,7 @@
 
                         if (type == "sick" || type == "stress") {
                             ctx.fillStyle = `rgba(147, 181, 72, 0.1)`;
-                            ctx.fillRect(x, Y_MARGIN, step_x, graph_canvas.height - 2*Y_MARGIN);
+                            ctx.fillRect(x, Y_MARGIN, step_x, graph_canvas.height - Y_MARGIN - Y_MARGIN_TOP);
                         }
                         
 
@@ -1003,7 +1010,7 @@
 
                         // background
                         ctx.fillStyle = background_color;
-                        ctx.fillRect(x, Y_MARGIN, step_x, graph_canvas.height - 2*Y_MARGIN);
+                        ctx.fillRect(x, Y_MARGIN, step_x, graph_canvas.height - Y_MARGIN - Y_MARGIN_TOP);
 
                         // flag
                         draw_flag(ctx, text, x, color, background_color, true);
@@ -1015,15 +1022,15 @@
 
                         // up down line
                         ctx.moveTo(x, Y_MARGIN);
-                        ctx.lineTo(x, graph_canvas.height - Y_MARGIN);
+                        ctx.lineTo(x, graph_canvas.height - Y_MARGIN_TOP);
                         ctx.stroke();
 
                         // top bottom lines
                         ctx.moveTo(x, Y_MARGIN);
                         ctx.lineTo(x + step_x, Y_MARGIN);
                         ctx.stroke();
-                        ctx.moveTo(x, graph_canvas.height - Y_MARGIN);
-                        ctx.lineTo(x + step_x, graph_canvas.height - Y_MARGIN);
+                        ctx.moveTo(x, graph_canvas.height - Y_MARGIN_TOP);
+                        ctx.lineTo(x + step_x, graph_canvas.height - Y_MARGIN_TOP);
                         ctx.stroke();
 
                         ctx.setLineDash([]); 
@@ -1036,7 +1043,7 @@
 
                         // background
                         ctx.fillStyle = background_color;
-                        ctx.fillRect(x, Y_MARGIN, step_x, graph_canvas.height - 2*Y_MARGIN);
+                        ctx.fillRect(x, Y_MARGIN, step_x, graph_canvas.height - Y_MARGIN - Y_MARGIN_TOP);
 
                         ctx.beginPath();
                         ctx.setLineDash([5, 5]);
@@ -1047,8 +1054,8 @@
                         ctx.moveTo(x, Y_MARGIN);
                         ctx.lineTo(x + step_x, Y_MARGIN);
                         ctx.stroke();
-                        ctx.moveTo(x, graph_canvas.height - Y_MARGIN);
-                        ctx.lineTo(x + step_x, graph_canvas.height - Y_MARGIN);
+                        ctx.moveTo(x, graph_canvas.height - Y_MARGIN_TOP);
+                        ctx.lineTo(x + step_x, graph_canvas.height - Y_MARGIN_TOP);
                         ctx.stroke();
 
                         ctx.setLineDash([]); 
@@ -1061,7 +1068,7 @@
 
                         // background
                         ctx.fillStyle = background_color;
-                        ctx.fillRect(x, Y_MARGIN, step_x, graph_canvas.height - 2*Y_MARGIN);
+                        ctx.fillRect(x, Y_MARGIN, step_x, graph_canvas.height - Y_MARGIN - Y_MARGIN_TOP);
 
                         // flag
                         draw_flag(ctx, text, x + step_x, color, background_color, true);
@@ -1073,15 +1080,15 @@
 
                         // up down line
                         ctx.moveTo(x + step_x, Y_MARGIN);
-                        ctx.lineTo(x + step_x, graph_canvas.height - Y_MARGIN);
+                        ctx.lineTo(x + step_x, graph_canvas.height - Y_MARGIN_TOP);
                         ctx.stroke();
 
                         // top bottom lines
                         ctx.moveTo(x, Y_MARGIN);
                         ctx.lineTo(x + step_x, Y_MARGIN);
                         ctx.stroke();
-                        ctx.moveTo(x, graph_canvas.height - Y_MARGIN);
-                        ctx.lineTo(x + step_x, graph_canvas.height - Y_MARGIN);
+                        ctx.moveTo(x, graph_canvas.height - Y_MARGIN_TOP);
+                        ctx.lineTo(x + step_x, graph_canvas.height - Y_MARGIN_TOP);
                         ctx.stroke();
 
                         ctx.setLineDash([]); 
