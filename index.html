@@ -436,72 +436,80 @@
         }
 
 
-        function mark_out_ovulation_days(event_days, start_date, ovulation_index) {
+        function mark_out_ovulation_days(event_days, today_date, ovulation_index, override_level) {
 
 
             // check for ovulation symptoms
             let last_temperatures = [];
-            let start_j = event_days.length + (ovulation_index - 10)
-            for (let j = start_j; j < event_days.length; j++) {
+            let start_j = ovulation_index - 10;
+            let start_date = get_date_plus_days(today_date, start_j - event_days.length);
+            for (let j = start_j; j < ovulation_index + 10; j++) {
                 if (j > 0) {
-                    if (event_days[j] == "clearer_slippery_mucus") {
-                        ovulation_index = j - event_days.length;
+                    if (event_days[j] == "clearer_slippery_mucus" && override_level < 1) {
+                        ovulation_index = j;
                     }
                     if (event_days[j] == "positive_ovulation_test" || event_days[j] == "faintly_positive_ovulation_test") {
-                        ovulation_index = j + 2 - event_days.length;
+                        if (override_level < 2) {
+                            ovulation_index = j - 2;
+                            override_level = 1;
+                        }
                     }
 
-                    // look at bb temp
-                    let curr_date = get_date_plus_days(start_date, j - event_days.length);
-                    let temp = bb_temperatures.get(date_to_str(curr_date));
-                    if (temp) {
-                        last_temperatures.push([curr_date, temp]);
+                    // modify if not ovulating
+                    if (
+                        (event_days[j-2] == "negative_ovulation_test" || event_days[j-2] == "sticky_or_thicker_mucus") &&
+                        ovulation_index == j-2
+                    ) {
+                        ovulation_index++;
+                    }
+                }
 
-                        if (last_temperatures.length > 5) {
-                            let ind = last_temperatures.length - 1;
-                            if (days_between(curr_date, last_temperatures[ind-1][0]) < 3) {
-                                // get average for last 2 days
-                                let recent_avg_temp = (temp + last_temperatures[ind-1][1]) / 2;
 
-                                // get average 3 days before that
-                                let past_avg_temp = 0;
-                                past_avg_temp += last_temperatures[ind-2][1];
-                                past_avg_temp += last_temperatures[ind-3][1];
-                                past_avg_temp += last_temperatures[ind-4][1];
-                                past_avg_temp /= 3;
-                                
-                                // check if temp has risen
-                                if (days_between(curr_date, last_temperatures[ind-4][0]) < 8) {
-                                    if (recent_avg_temp - past_avg_temp > 0.5) {
-                                        ovulation_index = j + 2 - event_days.length;
-                                    }
+                // look at bb temp
+                let curr_date = get_date_plus_days(today_date, j - event_days.length);
+                let temp = bb_temperatures.get(date_to_str(curr_date));
+                if (temp) {
+                    last_temperatures.push([curr_date, temp]);
+
+                    if (last_temperatures.length > 6) {
+                        let ind = last_temperatures.length - 1;
+                        if (days_between(curr_date, last_temperatures[ind-1][0]) < 3) {
+                            // get average for last 2 days
+                            let recent_avg_temp = (temp + last_temperatures[ind-1][1]) / 2;
+
+                            // get average 3 days before that
+                            let past_avg_temp = 0;
+                            past_avg_temp += last_temperatures[ind-3][1];
+                            past_avg_temp += last_temperatures[ind-4][1];
+                            past_avg_temp += last_temperatures[ind-5][1];
+                            past_avg_temp /= 3;
+                            
+                            // check if temp has risen
+                            if (days_between(curr_date, last_temperatures[ind-4][0]) < 8) {
+                                let diff = recent_avg_temp - past_avg_temp;
+                                if (diff > 0.4) {
+                                    override_level = 4;
+                                    ovulation_index = j - 2;
+                                    console.log("bb temp ovulation detected " + date_to_str(curr_date));
                                 }
-
                             }
 
                         }
 
                     }
 
-                    // modify if not ovulating
-                    if (
-                        (event_days[j-2] == "negative_ovulation_test" || event_days[j-2] == "sticky_or_thicker_mucus") &&
-                        ovulation_index == j-2 - event_days.length
-                    ) {
-                        ovulation_index++;
-                    }
                 }
             }
 
             // mark out days
             for (let o = ovulation_index - 5; o < ovulation_index; o++) {
-                let ovulation_date = get_date_plus_days(start_date, o);
+                let ovulation_date = get_date_plus_days(today_date, o - event_days.length);
                 predictions.set(date_to_str(ovulation_date), "ovulation");
                 if (o == ovulation_index-5) {
                     predictions.set(date_to_str(ovulation_date), "ovulation_start");
                 }
             }
-            let ovulation_date = get_date_plus_days(start_date, ovulation_index);
+            let ovulation_date = get_date_plus_days(today_date, ovulation_index - event_days.length);
             predictions.set(date_to_str(ovulation_date), "ovulation_end");
         }
 
@@ -567,14 +575,14 @@
                 // collect all events per day
                 let history_length_days = days_between(new Date(events_list[0][0]), curr_date);
                 let event_days = new Array(history_length_days).fill(null);
-                let start_date = new Date(events_list[0][0]);
+                let first_date = new Date(events_list[0][0]);
                 for (let date_and_events of events_list) {
                     let date_str = date_and_events[0];
                     let events = date_and_events[1];
 
                     for (let event of events) {
                         let curr_date = new Date(date_str);
-                        let index = days_between(start_date, curr_date);
+                        let index = days_between(first_date, curr_date);
                         let curr_event = event_days[index];
                         if (!curr_event || priorities.get(event) > priorities.get(curr_event)) {
                             event_days[index] = event;
@@ -617,7 +625,7 @@
 
                             // look back for ovulation (and predict past ovulations)
                             ovulation_index = current_period_start_index - avg_ovulation_symptoms_to_period_start;
-                            mark_out_ovulation_days(event_days, start_date, ovulation_index);
+                            mark_out_ovulation_days(event_days, curr_date, ovulation_index, 3);
                             
                         }
                     }
@@ -649,7 +657,7 @@
                 avg_symptoms_to_period_start = future_favor_weighted_avg(symptoms_to_period_start);
 
                 // MAKE PREDICTIONS (periods, ovulations, if pregnant: conception, due date, if pregnant 15 weeks: baby sizes)
-                let last_period_date = get_date_plus_days(start_date, last_period_start_index);
+                let last_period_date = get_date_plus_days(first_date, last_period_start_index);
                 let days_since_last_period = event_days.length - last_period_start_index;
                 let days_until_next_period = Math.max(avg_cycle_lenght - days_since_last_period, 0);
 
@@ -668,9 +676,9 @@
                 }
 
                 // if ovulation before next period
-                if (days_since_last_period > avg_ovulation_symptoms_to_period_start) {
-                    let days_until_ovulation = days_until_next_period - avg_ovulation_symptoms_to_period_start;
-                    mark_out_ovulation_days(event_days, curr_date, days_until_ovulation);
+                if (days_until_next_period < avg_ovulation_symptoms_to_period_start) {
+                    let days_until_ovulation = event_days.length + days_until_next_period - avg_ovulation_symptoms_to_period_start;
+                    mark_out_ovulation_days(event_days, curr_date, days_until_ovulation, 0);
                 }
 
                 if (!is_pregnant) {
@@ -730,7 +738,7 @@
 
                         // ovulation
                         let days_until_ovulation = days_until_next_period + p * avg_cycle_lenght - avg_ovulation_symptoms_to_period_start;
-                        mark_out_ovulation_days(event_days, curr_date, days_until_ovulation);
+                        mark_out_ovulation_days(event_days, curr_date, days_until_ovulation, 0);
                     }
                 }
                 
@@ -754,13 +762,13 @@
                     let index = positive_pregnancy_test[0];
                     let test_event = positive_pregnancy_test[1];
                     while (index > 0) {
-                        let search_date = get_date_plus_days(start_date, index);
+                        let search_date = get_date_plus_days(first_date, index);
                         if (predictions.has(date_to_str(search_date)) && predictions.get(date_to_str(search_date)).includes("ovulation")) {
                             break;
                         }
                         index--;
                     }
-                    let conception_date = get_date_plus_days(start_date, index);
+                    let conception_date = get_date_plus_days(first_date, index);
                     predictions.set(date_to_str(conception_date), "conception_date")
 
 
@@ -873,19 +881,6 @@
             // determine last temp
             let last_date = null;
             let last_temp = null; 
-            for (let key of bb_temperatures.keys()) {
-                const key_date = new Date(key);
-                if (start_date > key_date) {
-                    if (last_date == null) {
-                        last_date = key_date;
-                        last_temp = bb_temperatures.get(key);
-                    }
-                    else if (start_date - last_date > start_date - key_date) {
-                        last_date = key_date;
-                        last_temp = bb_temperatures.get(key);
-                    }
-                }
-            }
             let last_temp_y = last_temp? graph_canvas.height - Y_MARGIN - step_y * (last_temp - min_temp) : null;
             let last_temp_x = 0;
 
