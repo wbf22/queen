@@ -408,6 +408,13 @@
         function submit_temp() {
             
             const temp = parseFloat(document.getElementById("temp_input").value);
+
+            if (temp > 104 || temp < 92) {
+                alert("That temperature is strange: " + temp + " F\n\n(not celcius) If that's really your temperature you should see a doctor.")
+                return;
+            }
+
+
             const date = time_less_date_from_calendar(document.getElementById("temp_date_select"));
             
 
@@ -431,7 +438,9 @@
 
         function mark_out_ovulation_days(event_days, start_date, ovulation_index) {
 
+
             // check for ovulation symptoms
+            let last_temperatures = [];
             let start_j = event_days.length + (ovulation_index - 10)
             for (let j = start_j; j < event_days.length; j++) {
                 if (j > 0) {
@@ -440,6 +449,38 @@
                     }
                     if (event_days[j] == "positive_ovulation_test" || event_days[j] == "faintly_positive_ovulation_test") {
                         ovulation_index = j + 2 - event_days.length;
+                    }
+
+                    // look at bb temp
+                    let curr_date = get_date_plus_days(start_date, j - event_days.length);
+                    let temp = bb_temperatures.get(date_to_str(curr_date));
+                    if (temp) {
+                        last_temperatures.push([curr_date, temp]);
+
+                        if (last_temperatures.length > 5) {
+                            let ind = last_temperatures.length - 1;
+                            if (days_between(curr_date, last_temperatures[ind-1][0]) < 3) {
+                                // get average for last 2 days
+                                let recent_avg_temp = (temp + last_temperatures[ind-1][1]) / 2;
+
+                                // get average 3 days before that
+                                let past_avg_temp = 0;
+                                past_avg_temp += last_temperatures[ind-2][1];
+                                past_avg_temp += last_temperatures[ind-3][1];
+                                past_avg_temp += last_temperatures[ind-4][1];
+                                past_avg_temp /= 3;
+                                
+                                // check if temp has risen
+                                if (days_between(curr_date, last_temperatures[ind-4][0]) < 8) {
+                                    if (recent_avg_temp - past_avg_temp > 0.5) {
+                                        ovulation_index = j + 2 - event_days.length;
+                                    }
+                                }
+
+                            }
+
+                        }
+
                     }
 
                     // modify if not ovulating
@@ -822,6 +863,8 @@
                 }
             }
             max_temp = min_temp == max_temp? min_temp + 2 : max_temp;
+            max_temp += 0.5
+            min_temp -= 0.5
             Y_MARGIN = graph_canvas.height * .2;
             Y_MARGIN_TOP = graph_canvas.height * .4;
             BB_MARGIN = graph_canvas.height * .1;
