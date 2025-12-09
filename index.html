@@ -887,6 +887,7 @@
             // walk through dates drawing
             let curr_date = new Date(start_date);
             let i = 0;
+            let temperatures = [];
             while (curr_date < end_date) {
 
                 // draw gird lines
@@ -914,6 +915,7 @@
                 const date_str = date_to_str(curr_date);
                 if (bb_temperatures.has(date_str)) {
                     let temp = bb_temperatures.get(date_str);
+                    temperatures.push([new Date(curr_date), temp]);
                     let y = graph_canvas.height - BB_MARGIN - step_y * (temp - min_temp);
                     ctx.beginPath();
                     ctx.arc(x, y, 2.5, 0, Math.PI * 2); // full circle
@@ -1152,6 +1154,46 @@
 
                 i++;
                 curr_date.setDate(curr_date.getDate() + 1);
+            }
+
+
+            // draw temperature trend line
+            let last_average = null;
+            const sigma = 200000000; 
+            for (let x = 0; x < graph_canvas.width; x++) {
+                
+                // get closest date
+                let days = (x / step_x);
+                let ms_over = days * 24 * 60 * 60 * 1000;
+                let closest_date = new Date(start_date.getTime() + ms_over);
+
+                if (closest_date > temperatures[0][0] && closest_date < temperatures[temperatures.length-1][0]) {
+                    let average = 0;
+                    let total_weights = 0;
+                    for (let i = 0; i < temperatures.length; i++) {
+                        let diff = temperatures[i][0] - closest_date;
+                        let weight = Math.exp(- (diff * diff) / (2 * sigma * sigma));
+                        average += temperatures[i][1] * weight;
+                        total_weights += weight;
+                    }
+                    average /= total_weights;
+
+                    if (last_average && average) {
+                        let last_y = graph_canvas.height - BB_MARGIN - step_y * (last_average - min_temp);
+                        let y = graph_canvas.height - BB_MARGIN - step_y * (average - min_temp);
+                        ctx.beginPath();
+                        ctx.moveTo(x-1, last_y);
+                        ctx.lineTo(x, y);
+                        ctx.strokeStyle = 'rgb(200, 200, 200)';
+                        ctx.lineWidth = 3;
+                        ctx.stroke();
+
+                    }
+
+                    last_average = average;
+                }
+
+
             }
 
 
