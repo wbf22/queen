@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Website</title>
+    <title>Queen</title>
     <base target="_self">
 
 
@@ -21,7 +21,6 @@
             padding: 1rem;
             display: flex;
             align-items: center;
-
         }
 
         #body {
@@ -38,15 +37,15 @@
             justify-content: center;
             align-items: center;
             color: rgb(224, 133, 215);
-            background-color: #ffffff;
+            background-color: rgb(255, 255, 255);
         }
 
-        #element_47cef1bcf40b47b7 {
+        #canvas_container {
             border-radius: 5px;
             border: 2px solid rgb(224, 133, 215);
             height: 40vh;
             width: 60vw;
-            margin: 2rem 0rem 1rem;
+            margin: 2rem 0rem 0rem;
         }
 
         #element_b53e0e1d5ebd48ae {
@@ -63,30 +62,17 @@
             padding: 1rem;
         }
 
-        #element_9cfb296a35d9408c {
-            padding: 1rem;
-        }
-
-        #element_5e845d77fbd34fcc {
-            padding: 1rem;
-        }
-
         #element_26cf65e584e24d92 {
             width: 60vw;
             margin: 2rem;
         }
 
         #element_f2868fccda224bd3 {
-            display: grid;
+            display: flex;
             grid-template-columns: 1fr 4fr;
-            width: 50vh;
         }
 
         #element_265b987ceb254fe9 {
-            padding: 1rem;
-        }
-
-        #element_eb13771f5d5e49fd {
             padding: 1rem;
         }
 
@@ -97,7 +83,6 @@
             border: 2px solid rgb(224, 133, 215);
             border-radius: 5px;
         }
-
 
         #title {
             padding: 1rem;
@@ -137,15 +122,6 @@
             background-color: rgb(255, 255, 255);
         }
 
-        #submit_temp {
-            padding: 0.5rem;
-            background-color: rgb(224, 133, 215);
-            width: 10rem;
-            margin: 0rem 1rem;
-            color: rgb(255, 255, 255);
-            font-size: 1.2rem;
-        }
-
         #element_3d30a70ff1c4447d {
             display: flex;
             flex-direction: column;
@@ -165,33 +141,94 @@
             padding: 0.2rem;
             background-color: rgb(224, 133, 215);
             width: 4rem;
-            margin: 0rem 2rem;
+            margin: 0rem 1rem;
             color: rgb(255, 255, 255);
-            align-self: end;
             font-size: 0.7rem;
         }
 
-
         #graph_canvas {
-            
             height: 40vh;
             width: 60vw;
         }
 
-        #temp_date_select {
+        #clear_events {
+            background-color: rgb(255, 255, 255);
+            padding: 0.2rem;
+            width: 4rem;
+            margin: 0rem 1rem;
+            font-size: 0.7rem;
+        }
+
+        #element_a6eb3033d01144ad {
+            padding: 1rem;
+        }
+
+        #element_7e8168c4524f4645 {
             margin: 1rem 0rem;
         }
 
-        #clear_events {
-            background-color: #ffffff;
+        #element_e677238f138543b7 {
             padding: 0.5rem;
+            background-color: rgb(224, 133, 215);
             width: 10rem;
-            margin: 1rem 1rem 0rem;
+            margin: 0rem 1rem;
+            color: rgb(255, 255, 255);
             font-size: 1.2rem;
         }
 
+        #element_f6680eb128e546c5 {
+            display: flex;
+            grid-template-columns: 1fr 4fr;
+        }
 
-        @media (max-width: 1024px) {}
+        #element_cfd65f4507ba4e9e {
+            padding: 0rem;
+            display: flex;
+            justify-content: end;
+            margin: 0rem;
+            width: 50%;
+        }
+
+
+
+
+
+
+
+        #element_efaf3ab7083e4edb {
+            padding: 1rem;
+            display: flex;
+            justify-content: start;
+        }
+
+        #element_2de4c3a381154501 {
+            padding: 0rem;
+            width: 50%;
+            margin: 0px;
+        }
+
+        #date_label {
+            padding: 0rem;
+            margin: 0px;
+        }
+
+        @media (max-width: 1024px) {
+            #element_26cf65e584e24d92 {
+                width: 90vw;
+            }
+
+            #canvas_container {
+                width: 90vw;
+            }
+
+            #graph_canvas {
+                width: 90vw;
+            }
+
+            #element_b53e0e1d5ebd48ae {
+                width: 90vw;
+            }
+        }
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com" id="preconnect1">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" id="preconnect2">
@@ -204,15 +241,29 @@
 
     <div id="header">
         <h1 id="title">Queen</h1>
-        <svg width="3rem" height="3rem" viewBox="0 0 1024 1024" class="icon"  version="1.1" xmlns="http://www.w3.org/2000/svg"><path d="M978.254 300.427c0-44.771-36.295-81.066-81.066-81.066s-81.066 36.295-81.066 81.066c0 36.02 23.501 66.537 56 77.097-21.517 17.157-59.595 32.926-126.933 33.356-98.134 0.626-159.304-91.429-189.636-154.361 33.482-9.969 57.904-40.97 57.904-77.689 0-44.771-36.295-81.066-81.066-81.066s-81.066 36.295-81.066 81.066c0 36.404 23.999 67.203 57.038 77.443-31.165 62.724-93.137 154.607-188.769 154.607-73.523 0-114.78-18.623-137.64-37.145 27.448-12.988 46.441-40.925 46.441-73.307 0-44.771-36.295-81.066-81.066-81.066s-81.066 36.295-81.066 81.066c0 39.38 28.086 72.191 65.316 79.524-12.668 28.179-25.648 67.273-24.783 107.941l162.132 238.131c18.844 141.239 88.656 162.132 263.464 162.132 157.675 0 263.709-21.647 283.73-162.132l141.865-238.131c3.577-41.747-13.475-83.128-30.004-112.471 29.496-12.127 50.271-41.129 50.271-74.995zM491.787 178.828c0-22.427 18.179-40.606 40.606-40.606 22.427 0 40.606 18.179 40.606 40.606 0 22.427-18.179 40.606-40.606 40.606-22.427 0-40.606-18.179-40.606-40.606zM106.724 300.427c0-22.427 18.179-40.606 40.606-40.606 22.427 0 40.606 18.179 40.606 40.606 0 22.427-18.179 40.606-40.606 40.606-22.427 0-40.606-18.179-40.606-40.606zM775.59 726.022c-18.779 120.741-102.206 121.349-243.197 121.599-156.909 0.278-202.91 7.105-222.931-121.599L145.488 488.854c-1.113-56.179 19.344-97.228 19.344-97.228s21.993 57.759 154.763 57.759S532.392 295.36 532.392 295.36s98.177 154.025 212.798 154.025 154.763-57.759 154.763-57.759 19.344 40.685 19.344 96.266L775.59 726.022z m121.598-384.989c-22.427 0-40.606-18.179-40.606-40.606 0-22.427 18.179-40.606 40.606-40.606 22.427 0 40.606 18.179 40.606 40.606 0 22.427-18.179 40.606-40.606 40.606z" fill="#ffffff" /></svg>
+        <svg width="3rem" height="3rem" viewBox="0 0 1024 1024" class="icon" version="1.1"
+            xmlns="http://www.w3.org/2000/svg">
+            <path
+                d="M978.254 300.427c0-44.771-36.295-81.066-81.066-81.066s-81.066 36.295-81.066 81.066c0 36.02 23.501 66.537 56 77.097-21.517 17.157-59.595 32.926-126.933 33.356-98.134 0.626-159.304-91.429-189.636-154.361 33.482-9.969 57.904-40.97 57.904-77.689 0-44.771-36.295-81.066-81.066-81.066s-81.066 36.295-81.066 81.066c0 36.404 23.999 67.203 57.038 77.443-31.165 62.724-93.137 154.607-188.769 154.607-73.523 0-114.78-18.623-137.64-37.145 27.448-12.988 46.441-40.925 46.441-73.307 0-44.771-36.295-81.066-81.066-81.066s-81.066 36.295-81.066 81.066c0 39.38 28.086 72.191 65.316 79.524-12.668 28.179-25.648 67.273-24.783 107.941l162.132 238.131c18.844 141.239 88.656 162.132 263.464 162.132 157.675 0 263.709-21.647 283.73-162.132l141.865-238.131c3.577-41.747-13.475-83.128-30.004-112.471 29.496-12.127 50.271-41.129 50.271-74.995zM491.787 178.828c0-22.427 18.179-40.606 40.606-40.606 22.427 0 40.606 18.179 40.606 40.606 0 22.427-18.179 40.606-40.606 40.606-22.427 0-40.606-18.179-40.606-40.606zM106.724 300.427c0-22.427 18.179-40.606 40.606-40.606 22.427 0 40.606 18.179 40.606 40.606 0 22.427-18.179 40.606-40.606 40.606-22.427 0-40.606-18.179-40.606-40.606zM775.59 726.022c-18.779 120.741-102.206 121.349-243.197 121.599-156.909 0.278-202.91 7.105-222.931-121.599L145.488 488.854c-1.113-56.179 19.344-97.228 19.344-97.228s21.993 57.759 154.763 57.759S532.392 295.36 532.392 295.36s98.177 154.025 212.798 154.025 154.763-57.759 154.763-57.759 19.344 40.685 19.344 96.266L775.59 726.022z m121.598-384.989c-22.427 0-40.606-18.179-40.606-40.606 0-22.427 18.179-40.606 40.606-40.606 22.427 0 40.606 18.179 40.606 40.606 0 22.427-18.179 40.606-40.606 40.606z"
+                fill="#ffffff"></path>
+        </svg>
     </div>
 
     <div id="main_section">
         <div id="element_3d30a70ff1c4447d">
-            <div id="element_47cef1bcf40b47b7">
-                <canvas id="graph_canvas"></canvas>
+            <div id="canvas_container">
+                <canvas id="graph_canvas" width="715" height="326"></canvas>
             </div>
-            <button id="element_1f7656fec2654e5c" class="pink_border">download</button>
+
+
+            <div id="element_efaf3ab7083e4edb">
+                <div id="element_2de4c3a381154501">
+                    <p id="date_label">Nov 21</p>
+                </div>
+                <div id="element_cfd65f4507ba4e9e"><button id="clear_events" class="pink_border"
+                        onclick="clear_events()">Clear</button><button id="element_1f7656fec2654e5c"
+                        class="pink_border">download</button></div>
+            </div>
         </div>
         <div id="element_b53e0e1d5ebd48ae">
             <h2 id="element_7e557ad4033c45e2">Log Event</h2>
@@ -223,13 +274,15 @@
                 <option id="element_0849c3d19e254d31" value="light_bleeding">light bleeding</option>
                 <option id="element_c4ebd0ed321341be" value="spotting">spotting</option>
                 <option id="element_4693fc43131b4716" value="positive_pregnancy_test">positive pregnancy test</option>
-                <option id="element_4693fc43131b4716" value="faintly_positive_pregnancy_test">faintly positive pregnancy test</option>
+                <option id="element_4693fc43131b4716" value="faintly_positive_pregnancy_test">faintly positive pregnancy
+                    test</option>
                 <option id="element_4693fc43131b4716" value="negative_pregnancy_test">negative pregnancy test</option>
                 <option id="element_4693fc43131b4716" value="fatigue">fatigue</option>
                 <option id="element_4693fc43131b4716" value="tender_breasts">tender breasts</option>
                 <option id="element_4693fc43131b4716" value="cramps">cramps</option>
                 <option id="element_4693fc43131b4716" value="positive_ovulation_test">positive ovulation test</option>
-                <option id="element_4693fc43131b4716" value="faintly_positive_ovulation_test">faintly positive ovulation test</option>
+                <option id="element_4693fc43131b4716" value="faintly_positive_ovulation_test">faintly positive ovulation
+                    test</option>
                 <option id="element_4693fc43131b4716" value="negative_ovulation_test">negative ovulation test</option>
                 <option id="element_4693fc43131b4716" value="clearer_slippery_mucus">clear slippery mucus</option>
                 <option id="element_4693fc43131b4716" value="sticky_or_thicker_mucus">sticky or thicker mucus</option>
@@ -238,17 +291,25 @@
             </select>
             <input id="event_date_select" class="date_select" type="date">
             <button id="submit_event" class="pink_border" onclick="submit_event()">Submit</button>
-            <button id="clear_events" class="pink_border" onclick="clear_events()">Clear</button>
+
         </div>
         <div id="element_26cf65e584e24d92">
             <h2 id="element_fde29288b6384ae3">Log Basal Body Temperature</h2>
             <div id="element_f2868fccda224bd3">
                 <p id="element_265b987ceb254fe9">Temp</p>
                 <input id="temp_input" type="">
-                <p id="element_eb13771f5d5e49fd">Date</p>
-                <input id="temp_date_select" class="date_select" type="date">
-                <button id="submit_temp" class="pink_border" onclick="submit_temp()">Submit</button>
+
+
+
             </div>
+            <div id="element_f6680eb128e546c5">
+
+
+                <p id="element_a6eb3033d01144ad">Date</p>
+                <input id="temp_date_select" class="date_select" type="date">
+
+            </div>
+            <button id="element_e677238f138543b7" class="pink_border" onclick="submit_temp()">Submit</button>
         </div>
     </div>
 
@@ -261,7 +322,7 @@
             const options = { month: 'numeric', day: 'numeric', year: 'numeric' };
             return new Intl.DateTimeFormat('en-US', options).format(date);
         }
-    
+
         function time_less_date_from_calendar(input) {
             const [year, month, day] = input.value.split('-').map(Number);
             return new Date(year, month - 1, day);
@@ -271,7 +332,7 @@
             const now = new Date();
             return new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
         }
-    
+
         function add_to_list_map(map, key, value) {
 
             if (map.has(key)) {
@@ -319,7 +380,7 @@
             }
             return obj;
         }
-        
+
         function future_favor_weighted_avg(list) {
 
             let total_weights = 0;
@@ -332,7 +393,7 @@
             avg /= total_weights;
             return avg;
         }
-    
+
     </script>
 
 
@@ -370,15 +431,21 @@
         ]);
 
         let START_DATE = get_date_plus_days(time_less_date_today(), -20);
-        let FONT_SIZE = 20;
-        let GRAPH_DAY_WIDTH_PIXELS = 11;
+        let FONT_SIZE = window.innerWidth <= 1024 ? 12 : 15;
+        let GRAPH_DAY_WIDTH_PIXELS = window.innerWidth <= 1024 ? 6 : 11;
+        window.addEventListener('resize', () => {
+            FONT_SIZE = window.innerWidth <= 1024 ? 12 : 15;
+            GRAPH_DAY_WIDTH_PIXELS = window.innerWidth <= 1024 ? 6 : 11;
+            draw_graph(START_DATE, bb_temperatures, events);
+        });
+        let SELECTED_DATE = null;
 
         let event_type_dropdown = document.getElementById("event_type_dropdown");
         let graph_canvas = document.getElementById("graph_canvas");
         const ctx = graph_canvas.getContext('2d');
 
 
-        
+
         function submit_event() {
 
             // add to graph
@@ -394,9 +461,9 @@
 
         function clear_events() {
             // remove from graph
-            const date = time_less_date_from_calendar(document.getElementById("event_date_select"));
-            const date_str = date_to_str(date);
+            const date_str = date_to_str(SELECTED_DATE);
             events.delete(date_str);
+            bb_temperatures.delete(date_str);
             draw_graph(START_DATE, bb_temperatures, events);
 
 
@@ -406,7 +473,7 @@
         }
 
         function submit_temp() {
-            
+
             const temp = parseFloat(document.getElementById("temp_input").value);
 
             if (temp > 104 || temp < 92) {
@@ -416,7 +483,7 @@
 
 
             const date = time_less_date_from_calendar(document.getElementById("temp_date_select"));
-            
+
 
             // add to graph
             bb_temperatures.set(
@@ -457,8 +524,8 @@
 
                     // modify if not ovulating
                     if (
-                        (event_days[j-2] == "negative_ovulation_test" || event_days[j-2] == "sticky_or_thicker_mucus") &&
-                        ovulation_index == j-2
+                        (event_days[j - 2] == "negative_ovulation_test" || event_days[j - 2] == "sticky_or_thicker_mucus") &&
+                        ovulation_index == j - 2
                     ) {
                         ovulation_index++;
                     }
@@ -473,19 +540,19 @@
 
                     if (last_temperatures.length > 6) {
                         let ind = last_temperatures.length - 1;
-                        if (days_between(curr_date, last_temperatures[ind-1][0]) < 3) {
+                        if (days_between(curr_date, last_temperatures[ind - 1][0]) < 3) {
                             // get average for last 2 days
-                            let recent_avg_temp = (temp + last_temperatures[ind-1][1]) / 2;
+                            let recent_avg_temp = (temp + last_temperatures[ind - 1][1]) / 2;
 
                             // get average 3 days before that
                             let past_avg_temp = 0;
-                            past_avg_temp += last_temperatures[ind-3][1];
-                            past_avg_temp += last_temperatures[ind-4][1];
-                            past_avg_temp += last_temperatures[ind-5][1];
+                            past_avg_temp += last_temperatures[ind - 3][1];
+                            past_avg_temp += last_temperatures[ind - 4][1];
+                            past_avg_temp += last_temperatures[ind - 5][1];
                             past_avg_temp /= 3;
-                            
+
                             // check if temp has risen
-                            if (days_between(curr_date, last_temperatures[ind-4][0]) < 8) {
+                            if (days_between(curr_date, last_temperatures[ind - 4][0]) < 8) {
                                 let diff = recent_avg_temp - past_avg_temp;
                                 if (diff > 0.4) {
                                     override_level = 4;
@@ -505,7 +572,7 @@
             for (let o = ovulation_index - 5; o < ovulation_index; o++) {
                 let ovulation_date = get_date_plus_days(today_date, o - event_days.length);
                 predictions.set(date_to_str(ovulation_date), "ovulation");
-                if (o == ovulation_index-5) {
+                if (o == ovulation_index - 5) {
                     predictions.set(date_to_str(ovulation_date), "ovulation_start");
                 }
             }
@@ -514,7 +581,7 @@
         }
 
         function make_predictions(events, bb_temperatures) {
-            
+
             /*
                 return:
                 - period predictions
@@ -597,7 +664,7 @@
                 let positive_pregnancy_test = null;
                 let consecutive_bleeding = 0;
                 for (let i = 0; i < event_days.length; i++) {
-                    
+
                     let event = event_days[i];
                     if (event && is_bleeding(event)) {
 
@@ -611,27 +678,27 @@
 
                         // period has started
                         if (consecutive_bleeding == 2) {
-                            current_period_start_index = i-1;
+                            current_period_start_index = i - 1;
                             if (last_period_start_index) {
                                 cycle_lengths.push(current_period_start_index - last_period_start_index);
                             }
 
                             // look back for symptoms
-                            for (let j = i-7; j < i; j++) {
+                            for (let j = i - 7; j < i; j++) {
                                 if (j > 0 && (event_days[j] == "fatigue" || event_days[j] == "tender_breasts" || event_days[j] == "cramps")) {
-                                    symptoms_to_period_start.push(i-j);
+                                    symptoms_to_period_start.push(i - j);
                                 }
                             }
 
                             // look back for ovulation (and predict past ovulations)
                             ovulation_index = current_period_start_index - avg_ovulation_symptoms_to_period_start;
                             mark_out_ovulation_days(event_days, curr_date, ovulation_index, 3);
-                            
+
                         }
                     }
                     else {
                         // period has ended
-                        if (consecutive_bleeding > 2){
+                        if (consecutive_bleeding > 2) {
                             period_durations.push(consecutive_bleeding);
                             last_period_start_index = current_period_start_index;
                             current_period_start_index = null;
@@ -641,7 +708,7 @@
                         if (event == "positive_pregnancy_test" || event == "faintly_positive_pregnancy_test") {
                             positive_pregnancy_test = [i, event];
                         }
-                        
+
                         if (event == "negative_pregnancy_test") {
                             positive_pregnancy_test = null;
                         }
@@ -693,9 +760,9 @@
 
                     // if recent symptoms and period soon
                     if (days_until_next_period < 7) {
-                        for (let i = event_days.length-1; i > event_days.length-5; i--) {
+                        for (let i = event_days.length - 1; i > event_days.length - 5; i--) {
                             if (event_days[i] == "fatigue" || event_days[i] == "tender_breasts" || event_days[i] == "cramps") {
-                                days_until_next_period = (i - event_days.length) + avg_symptoms_to_period_start; 
+                                days_until_next_period = (i - event_days.length) + avg_symptoms_to_period_start;
                                 days_until_next_period = Math.max(days_until_next_period, 0);
                                 break;
                             }
@@ -704,13 +771,13 @@
 
                     // if recent symptoms and ovulation soon (12-16 days before period)
                     if (days_until_next_period > 12 && days_until_next_period < 20) {
-                        for (let i = event_days.length-1; i > event_days.length-5; i--) {
+                        for (let i = event_days.length - 1; i > event_days.length - 5; i--) {
                             if (
-                                event_days[i] == "positive_ovulation_test" || 
-                                event_days[i] == "faintly_positive_ovulation_test" || 
+                                event_days[i] == "positive_ovulation_test" ||
+                                event_days[i] == "faintly_positive_ovulation_test" ||
                                 event_days[i] == "clearer_slippery_mucus"
                             ) {
-                                days_until_next_period = (i - event_days.length) + avg_ovulation_symptoms_to_period_start; 
+                                days_until_next_period = (i - event_days.length) + avg_ovulation_symptoms_to_period_start;
                                 days_until_next_period = Math.max(days_until_next_period, 0);
                                 break;
                             }
@@ -721,14 +788,14 @@
 
                     // predict out periods and ovulations for the next 10 cycles
                     for (let p = 0; p < 10; p++) {
-                        
+
                         // period
                         let period_date = new Date(next_period_date);
                         period_date.setDate(period_date.getDate() + p * avg_cycle_lenght);
                         for (let i = 0; i < avg_period_duration; i++) {
                             predictions.set(date_to_str(period_date), "period");
-                            period_date.setDate(period_date.getDate()+1);
-                            if (i == days_until_ovulation_start-5) {
+                            period_date.setDate(period_date.getDate() + 1);
+                            if (i == days_until_ovulation_start - 5) {
                                 predictions.set(date_to_str(ovulation_date), "period_start");
                             }
                             else if (i == days_until_ovulation_start) {
@@ -741,8 +808,8 @@
                         mark_out_ovulation_days(event_days, curr_date, days_until_ovulation, 0);
                     }
                 }
-                
-                
+
+
                 // pregnancy pridictions
                 if (is_pregnant) {
                     /*
@@ -777,13 +844,13 @@
                     predictions.set(date_to_str(due_date), "due_date")
 
                     // baby sizes if over 15 weeks
-                    if (index > 15*7) {
-                        let week15 = get_date_plus_days(conception_date, 15*7);
-                        let week20 = get_date_plus_days(conception_date, 20*7);
-                        let week25 = get_date_plus_days(conception_date, 25*7);
-                        let week30 = get_date_plus_days(conception_date, 30*7);
-                        let week35 = get_date_plus_days(conception_date, 35*7);
-                        let week40 = get_date_plus_days(conception_date, 40*7);
+                    if (index > 15 * 7) {
+                        let week15 = get_date_plus_days(conception_date, 15 * 7);
+                        let week20 = get_date_plus_days(conception_date, 20 * 7);
+                        let week25 = get_date_plus_days(conception_date, 25 * 7);
+                        let week30 = get_date_plus_days(conception_date, 30 * 7);
+                        let week35 = get_date_plus_days(conception_date, 35 * 7);
+                        let week40 = get_date_plus_days(conception_date, 40 * 7);
 
                         predictions.set(week15, "baby is a 🍎");
                         predictions.set(week20, "baby is a 🍌");
@@ -793,11 +860,11 @@
                         predictions.set(week40, "baby is a 🏀");
                     }
 
-                    
-                    
+
+
                 }
 
-                
+
             }
 
         }
@@ -818,9 +885,9 @@
 
             // determine flag position
             let max_text_pos = (graph_canvas.height - Y_MARGIN - Y_MARGIN_TOP) / FONT_SIZE;
-            let text_pos = text_positions[text_i] < max_text_pos? text_positions[text_i] : text_positions[text_i] % Math.floor(max_text_pos);
-            let y_text = Y_MARGIN + FONT_SIZE*text_pos;
-            
+            let text_pos = text_positions[text_i] < max_text_pos ? text_positions[text_i] : text_positions[text_i] % Math.floor(max_text_pos);
+            let y_text = Y_MARGIN + FONT_SIZE * text_pos;
+
 
             // draw line
             ctx.beginPath();
@@ -832,21 +899,23 @@
             ctx.moveTo(x, y_text);
             ctx.lineTo(x, graph_canvas.height - Y_MARGIN_TOP);
             ctx.stroke();
-            ctx.setLineDash([]);    
+            ctx.setLineDash([]);
 
             // draw text with background
             ctx.font = `${FONT_SIZE}px Arial`;
             const metrics = ctx.measureText(text);
-            const textWidth = metrics.width+8;
+            const textWidth = metrics.width + 8;
             const textHeight = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
             ctx.fillStyle = background_color;
-            ctx.fillRect(x - 1, y_text - metrics.actualBoundingBoxAscent-4, textWidth+4, textHeight+4);
+            ctx.fillRect(x - 1, y_text - metrics.actualBoundingBoxAscent - 4, textWidth + 4, textHeight + 4);
             ctx.fillStyle = color;
             ctx.fillText(text, x + 5, y_text);
             text_i = (text_i + 1) % text_positions.length;
         }
 
         function draw_graph(start_date, bb_temperatures, events) {
+
+
             // clear graph
             text_i = 0;
             const rect = graph_canvas.getBoundingClientRect();
@@ -858,10 +927,11 @@
             const num_days = graph_canvas.width / GRAPH_DAY_WIDTH_PIXELS;
             end_date = get_date_plus_days(start_date, num_days);
             const step_x = GRAPH_DAY_WIDTH_PIXELS;
+            SELECTED_DATE = get_date_plus_days(start_date, graph_canvas.width / 2 / step_x);
 
             // determine temp y step
-            let min_temp = bb_temperatures.size == 0? 96 : bb_temperatures.values().next().value;
-            let max_temp = bb_temperatures.size == 0? 100 : bb_temperatures.values().next().value;
+            let min_temp = bb_temperatures.size == 0 ? 96 : bb_temperatures.values().next().value;
+            let max_temp = bb_temperatures.size == 0 ? 100 : bb_temperatures.values().next().value;
             for (let temp of bb_temperatures.values()) {
                 if (temp < min_temp) {
                     min_temp = temp;
@@ -870,18 +940,18 @@
                     max_temp = temp;
                 }
             }
-            max_temp = min_temp == max_temp? min_temp + 2 : max_temp;
+            max_temp = min_temp == max_temp ? min_temp + 2 : max_temp;
             max_temp += 0.5
             min_temp -= 0.5
             Y_MARGIN = graph_canvas.height * .2;
             Y_MARGIN_TOP = graph_canvas.height * .4;
             BB_MARGIN = graph_canvas.height * .1;
-            const step_y = (Y_MARGIN_TOP - BB_MARGIN) / (max_temp-min_temp);
+            const step_y = (Y_MARGIN_TOP - BB_MARGIN) / (max_temp - min_temp);
 
             // determine last temp
             let last_date = null;
-            let last_temp = null; 
-            let last_temp_y = last_temp? graph_canvas.height - Y_MARGIN - step_y * (last_temp - min_temp) : null;
+            let last_temp = null;
+            let last_temp_y = last_temp ? graph_canvas.height - Y_MARGIN - step_y * (last_temp - min_temp) : null;
             let last_temp_x = 0;
 
             // walk through dates drawing
@@ -901,7 +971,7 @@
                     ctx.fillText(formatted, x + 5, graph_canvas.height - 20);
                 }
                 if (curr_date.getDate() == 1) {
-    
+
                     ctx.beginPath();
                     ctx.moveTo(x, 0);
                     ctx.lineTo(x, graph_canvas.height);
@@ -910,6 +980,22 @@
                     ctx.stroke();
 
                 }
+
+                if (curr_date.getDate() == SELECTED_DATE.getDate() && curr_date.getMonth() == SELECTED_DATE.getMonth()) {
+                    ctx.fillStyle = `rgba(102, 192, 222,0.5)`;
+                    ctx.fillRect(x, Y_MARGIN / 2, 3, graph_canvas.height - Y_MARGIN);
+
+                    // set date label
+                    const options = { month: 'short', day: 'numeric' };
+                    const formatted = new Intl.DateTimeFormat('en-US', options).format(curr_date);
+                    document.getElementById("date_label").textContent = formatted;
+
+                    // set date inputs
+                    const date_str = SELECTED_DATE.toISOString().split('T')[0];
+                    document.getElementById("event_date_select").value = date_str;
+                    document.getElementById("temp_date_select").value = date_str;
+                }
+
 
                 // draw temperature for this day
                 const date_str = date_to_str(curr_date);
@@ -921,7 +1007,7 @@
                     ctx.arc(x, y, 2.5, 0, Math.PI * 2); // full circle
                     ctx.fillStyle = 'rgb(224, 133, 215)'; // color of the dot
                     ctx.fill();
-    
+
                     if (last_temp_y) {
                         ctx.beginPath();
                         ctx.moveTo(last_temp_x, last_temp_y);
@@ -956,7 +1042,7 @@
                             }
                             else if (type == "light_bleeding") {
                                 strength = 0.2;
-                                
+
                             }
                             else if (type == "spotting") {
                                 strength = 0.1;
@@ -968,19 +1054,19 @@
                         }
 
                         if (type == "positive_pregnancy_test" || type == "faintly_positive_pregnancy_test") {
-                            let text = curr_date.getDate() + (type == "positive_pregnancy_test"? " positive pregnancy test 👑" : " faint pregnancy test");
-                            let color = type == "positive_pregnancy_test"? "rgba(219, 33, 117, 1.0)" : "rgba(219, 33, 117, 1.0)";
-                            let background_color = type == "positive_pregnancy_test"? "rgba(219, 33, 117, 0.3)" : "rgba(219, 33, 117, 0.3)";
+                            let text = curr_date.getDate() + (type == "positive_pregnancy_test" ? " positive pregnancy test 👑" : " faint pregnancy test");
+                            let color = type == "positive_pregnancy_test" ? "rgba(219, 33, 117, 1.0)" : "rgba(219, 33, 117, 1.0)";
+                            let background_color = type == "positive_pregnancy_test" ? "rgba(219, 33, 117, 0.3)" : "rgba(219, 33, 117, 0.3)";
                             draw_flag(ctx, text, x, color, background_color, false);
                         }
-                        
+
                         if (type == "negative_pregnancy_test") {
                             let text = curr_date.getDate() + " negative pregnancy test";
                             let color = "rgba(110, 57, 0, 1.0)";
                             let background_color = "rgba(110, 57, 0, 0.3)";
                             draw_flag(ctx, text, x, color, background_color, false);
                         }
-                        
+
                         if (type == "fatigue") {
                             let text = curr_date.getDate() + " fatigue";
                             let color = "rgba(162, 39, 219, 1.0)";
@@ -1017,12 +1103,12 @@
                         }
 
                         if (type == "positive_ovulation_test" || type == "faintly_positive_ovulation_test") {
-                            let text = curr_date.getDate() + (type == "positive_ovulation_test"? " positive ovulation test" : " faint ovulation test");
-                            let color = type == "positive_ovulation_test"? "rgba(219, 33, 117, 1.0)" : "rgba(204, 65, 128, 1.0)";
-                            let background_color = type == "positive_ovulation_test"? "rgba(219, 33, 117, 0.3)" : "rgba(204, 65, 128, 0.3)";
+                            let text = curr_date.getDate() + (type == "positive_ovulation_test" ? " positive ovulation test" : " faint ovulation test");
+                            let color = type == "positive_ovulation_test" ? "rgba(219, 33, 117, 1.0)" : "rgba(204, 65, 128, 1.0)";
+                            let background_color = type == "positive_ovulation_test" ? "rgba(219, 33, 117, 0.3)" : "rgba(204, 65, 128, 0.3)";
                             draw_flag(ctx, text, x, color, background_color, false);
                         }
-                        
+
                         if (type == "negative_ovulation_test") {
                             let text = curr_date.getDate() + " negative ovulation test";
                             let color = "rgba(110, 57, 0, 1.0)";
@@ -1034,10 +1120,10 @@
                             ctx.fillStyle = `rgba(147, 181, 72, 0.1)`;
                             ctx.fillRect(x, Y_MARGIN, step_x, graph_canvas.height - Y_MARGIN - Y_MARGIN_TOP);
                         }
-                        
+
 
                     }
-                    
+
                 }
 
                 // draw predications for this day
@@ -1073,7 +1159,7 @@
                         ctx.lineTo(x + step_x, graph_canvas.height - Y_MARGIN_TOP);
                         ctx.stroke();
 
-                        ctx.setLineDash([]); 
+                        ctx.setLineDash([]);
 
 
                     }
@@ -1098,7 +1184,7 @@
                         ctx.lineTo(x + step_x, graph_canvas.height - Y_MARGIN_TOP);
                         ctx.stroke();
 
-                        ctx.setLineDash([]); 
+                        ctx.setLineDash([]);
 
                     }
                     else if (prediction == "ovulation_end" || prediction == "conception_date") {
@@ -1131,7 +1217,7 @@
                         ctx.lineTo(x + step_x, graph_canvas.height - Y_MARGIN_TOP);
                         ctx.stroke();
 
-                        ctx.setLineDash([]); 
+                        ctx.setLineDash([]);
 
                     }
                     else if (prediction == "due_date") {
@@ -1152,53 +1238,52 @@
                     }
                 }
 
+
                 i++;
                 curr_date.setDate(curr_date.getDate() + 1);
             }
 
 
             // draw temperature trend line
-            let last_average = null;
-            const sigma = 200000000; 
-            for (let x = 0; x < graph_canvas.width; x++) {
-                
-                // get closest date
-                let days = (x / step_x);
-                let ms_over = days * 24 * 60 * 60 * 1000;
-                let closest_date = new Date(start_date.getTime() + ms_over);
+            if (temperatures.length > 0) {
+                let last_average = null;
+                const sigma = 200000000;
+                for (let x = 0; x < graph_canvas.width; x++) {
 
-                if (closest_date > temperatures[0][0] && closest_date < temperatures[temperatures.length-1][0]) {
-                    let average = 0;
-                    let total_weights = 0;
-                    for (let i = 0; i < temperatures.length; i++) {
-                        let diff = temperatures[i][0] - closest_date;
-                        let weight = Math.exp(- (diff * diff) / (2 * sigma * sigma));
-                        average += temperatures[i][1] * weight;
-                        total_weights += weight;
+                    // get closest date
+                    let days = (x / step_x);
+                    let ms_over = days * 24 * 60 * 60 * 1000;
+                    let closest_date = new Date(start_date.getTime() + ms_over);
+
+                    if (closest_date > temperatures[0][0] && closest_date < temperatures[temperatures.length - 1][0]) {
+                        let average = 0;
+                        let total_weights = 0;
+                        for (let i = 0; i < temperatures.length; i++) {
+                            let diff = temperatures[i][0] - closest_date;
+                            let weight = Math.exp(- (diff * diff) / (2 * sigma * sigma));
+                            average += temperatures[i][1] * weight;
+                            total_weights += weight;
+                        }
+                        average /= total_weights;
+
+                        if (last_average && average) {
+                            let last_y = graph_canvas.height - BB_MARGIN - step_y * (last_average - min_temp);
+                            let y = graph_canvas.height - BB_MARGIN - step_y * (average - min_temp);
+                            ctx.beginPath();
+                            ctx.moveTo(x - 1, last_y);
+                            ctx.lineTo(x, y);
+                            ctx.strokeStyle = 'rgb(200, 200, 200)';
+                            ctx.lineWidth = 3;
+                            ctx.stroke();
+                        }
+
+                        last_average = average;
                     }
-                    average /= total_weights;
-
-                    if (last_average && average) {
-                        let last_y = graph_canvas.height - BB_MARGIN - step_y * (last_average - min_temp);
-                        let y = graph_canvas.height - BB_MARGIN - step_y * (average - min_temp);
-                        ctx.beginPath();
-                        ctx.moveTo(x-1, last_y);
-                        ctx.lineTo(x, y);
-                        ctx.strokeStyle = 'rgb(200, 200, 200)';
-                        ctx.lineWidth = 3;
-                        ctx.stroke();
-
-                    }
-
-                    last_average = average;
                 }
-
-
             }
 
-
         }
-        
+
         // dragging/scrolling
         let startX = 0;
         let startY = 0;
@@ -1264,7 +1349,7 @@
         graph_canvas.addEventListener("mousemove", drag_move);
         graph_canvas.addEventListener("mouseup", drag_end);
 
-        
+
         // startup
         events = local_storage_get("events");
         if (!events || bb_temperatures.length == 0) events = new Map();
@@ -1274,6 +1359,14 @@
         draw_graph(START_DATE, bb_temperatures, events, predictions);
 
     </script>
+
+
+
+
+
+
+
+
 
 
 
