@@ -137,7 +137,7 @@
             width: 10rem;
         }
 
-        #element_1f7656fec2654e5c {
+        .upload_download {
             padding: 0.2rem;
             background-color: rgb(224, 133, 215);
             width: 4rem;
@@ -263,8 +263,8 @@
                 <div id="element_cfd65f4507ba4e9e">
                     <button id="clear_events" class="pink_border"
                         onclick="clear_events()">Clear</button>
-                    <button id="element_1f7656fec2654e5c" onclick="upload_data()" class="pink_border">upload</button>
-                    <button id="element_1f7656fec2654e5c" onclick="download_data()" class="pink_border">download</button>
+                    <button id="upload_button" class="upload_download pink_border">upload</button>
+                    <button id="dowload_button" onclick="download_data()" class="upload_download pink_border">download</button>
                 </div>
             </div>
         </div>
@@ -1468,6 +1468,13 @@
     <!-- downalod upload -->
     <script>
 
+
+// upload_button" class="upload_download pink_border">upload</button>
+//                     <button id="dowload_button"
+
+
+
+
         function download_data() {
 
             let csv_content = [];
@@ -1490,15 +1497,15 @@
 
 
             let csv_string = csv_content.join("\n");
-            let blob = new Blob([csv_string], { type: 'text/csv' });
-            let url = URL.createObjectURL(blob);
+            
+
+            // Use data URL instead of blob URL for better mobile support
+            let data_uri = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv_string);
+            
             let a = document.createElement('a');
-            a.href = url;
+            a.href = data_uri;
             a.download = 'period_tracker_data.csv';
-            document.body.appendChild(a);
             a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
         }
 
 
