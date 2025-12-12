@@ -438,13 +438,6 @@
         ]);
 
         let START_DATE = get_date_plus_days(time_less_date_today(), -20);
-        let FONT_SIZE = window.innerWidth <= 1024 ? 12 : 15;
-        let GRAPH_DAY_WIDTH_PIXELS = window.innerWidth <= 1024 ? 6 : 11;
-        window.addEventListener('resize', () => {
-            FONT_SIZE = window.innerWidth <= 1024 ? 12 : 15;
-            GRAPH_DAY_WIDTH_PIXELS = window.innerWidth <= 1024 ? 6 : 11;
-            draw_graph(START_DATE, bb_temperatures, events);
-        });
         let SELECTED_DATE = null;
 
         let event_type_dropdown = document.getElementById("event_type_dropdown");
@@ -899,6 +892,15 @@
 
     <!-- graph -->
     <script>
+
+        let FONT_SIZE = window.innerWidth <= 1024 ? 24 : 30;
+        let GRAPH_DAY_WIDTH_PIXELS = window.innerWidth <= 1024 ? 12 : 22;
+        window.addEventListener('resize', () => {
+            FONT_SIZE = window.innerWidth <= 1024 ? 24 : 30;
+            GRAPH_DAY_WIDTH_PIXELS = window.innerWidth <= 1024 ? 6 : 11;
+            draw_graph(START_DATE, bb_temperatures, events);
+        });
+        
         let Y_MARGIN = 40;
         let Y_MARGIN_TOP = 80;
         let BB_MARGIN = 20;
@@ -942,8 +944,8 @@
             // clear graph
             text_i = 0;
             const rect = graph_canvas.getBoundingClientRect();
-            graph_canvas.width = rect.width;
-            graph_canvas.height = rect.height;
+            graph_canvas.width = rect.width * 2;
+            graph_canvas.height = rect.height * 2;
             ctx.clearRect(0, 0, graph_canvas.width, graph_canvas.height);
 
             // determine x step
@@ -1006,7 +1008,7 @@
 
                 if (curr_date.getDate() == SELECTED_DATE.getDate() && curr_date.getMonth() == SELECTED_DATE.getMonth()) {
                     ctx.fillStyle = `rgba(102, 192, 222,0.5)`;
-                    ctx.fillRect(x, Y_MARGIN / 2, 3, graph_canvas.height - Y_MARGIN);
+                    ctx.fillRect(x, Y_MARGIN / 2, 6, graph_canvas.height - Y_MARGIN);
 
                     // set date label
                     const options = { month: 'short', day: 'numeric' };
