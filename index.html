@@ -1469,12 +1469,6 @@
     <script>
 
 
-// upload_button" class="upload_download pink_border">upload</button>
-//                     <button id="dowload_button"
-
-
-
-
         function download_data() {
 
             let csv_content = [];
@@ -1500,7 +1494,8 @@
             
 
             // Use data URL instead of blob URL for better mobile support
-            let data_uri = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv_string);
+            let bom = '\uFEFF';
+            let data_uri = 'data:text/csv;charset=utf-8,' + encodeURIComponent(bom + csv_string);
             
             let a = document.createElement('a');
             a.href = data_uri;
