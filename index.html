@@ -260,9 +260,12 @@
                 <div id="element_2de4c3a381154501">
                     <p id="date_label">Nov 21</p>
                 </div>
-                <div id="element_cfd65f4507ba4e9e"><button id="clear_events" class="pink_border"
-                        onclick="clear_events()">Clear</button><button id="element_1f7656fec2654e5c"
-                        class="pink_border">download</button></div>
+                <div id="element_cfd65f4507ba4e9e">
+                    <button id="clear_events" class="pink_border"
+                        onclick="clear_events()">Clear</button>
+                    <button id="element_1f7656fec2654e5c" onclick="upload_data()" class="pink_border">upload</button>
+                    <button id="element_1f7656fec2654e5c" onclick="download_data()" class="pink_border">download</button>
+                </div>
             </div>
         </div>
         <div id="element_b53e0e1d5ebd48ae">
@@ -373,12 +376,16 @@
             }
         }
 
+        function local_storage_get_map(key) {
+            const stored = localStorage.getItem(key);
+            if (!stored) return new Map();
+            
+            const obj = JSON.parse(stored);
+            return new Map(obj);
+        }
+
         function local_storage_get(key) {
-            const obj = JSON.parse(localStorage.getItem(key));
-            if (obj instanceof Array && obj[0] instanceof Array) {
-                return new Map(obj);
-            }
-            return obj;
+            return JSON.parse(localStorage.getItem(key));
         }
 
         function future_favor_weighted_avg(list) {
@@ -510,63 +517,66 @@
             let last_temperatures = [];
             let start_j = ovulation_index - 10;
             let start_date = get_date_plus_days(today_date, start_j - event_days.length);
-            for (let j = start_j; j < ovulation_index + 10; j++) {
-                if (j > 0) {
-                    if (event_days[j] == "clearer_slippery_mucus" && override_level < 1) {
-                        ovulation_index = j;
-                    }
-                    if (event_days[j] == "positive_ovulation_test" || event_days[j] == "faintly_positive_ovulation_test") {
-                        if (override_level < 2) {
-                            ovulation_index = j - 2;
-                            override_level = 1;
+            if (override_level > -1) {
+                for (let j = start_j; j < ovulation_index + 10; j++) {
+                    if (j > 0) {
+                        if (event_days[j] == "clearer_slippery_mucus" && override_level < 1) {
+                            ovulation_index = j;
+                        }
+                        if (event_days[j] == "positive_ovulation_test" || event_days[j] == "faintly_positive_ovulation_test") {
+                            if (override_level < 2) {
+                                ovulation_index = j - 2;
+                                override_level = 1;
+                            }
+                        }
+
+                        // modify if not ovulating
+                        if (
+                            (event_days[j - 2] == "negative_ovulation_test" || event_days[j - 2] == "sticky_or_thicker_mucus") &&
+                            ovulation_index == j - 2
+                        ) {
+                            ovulation_index++;
                         }
                     }
 
-                    // modify if not ovulating
-                    if (
-                        (event_days[j - 2] == "negative_ovulation_test" || event_days[j - 2] == "sticky_or_thicker_mucus") &&
-                        ovulation_index == j - 2
-                    ) {
-                        ovulation_index++;
-                    }
-                }
 
+                    // look at bb temp
+                    let curr_date = get_date_plus_days(today_date, j - event_days.length);
+                    let temp = bb_temperatures.get(date_to_str(curr_date));
+                    if (temp) {
+                        last_temperatures.push([curr_date, temp]);
 
-                // look at bb temp
-                let curr_date = get_date_plus_days(today_date, j - event_days.length);
-                let temp = bb_temperatures.get(date_to_str(curr_date));
-                if (temp) {
-                    last_temperatures.push([curr_date, temp]);
+                        if (last_temperatures.length > 6) {
+                            let ind = last_temperatures.length - 1;
+                            if (days_between(curr_date, last_temperatures[ind - 1][0]) < 3) {
+                                // get average for last 2 days
+                                let recent_avg_temp = (temp + last_temperatures[ind - 1][1]) / 2;
 
-                    if (last_temperatures.length > 6) {
-                        let ind = last_temperatures.length - 1;
-                        if (days_between(curr_date, last_temperatures[ind - 1][0]) < 3) {
-                            // get average for last 2 days
-                            let recent_avg_temp = (temp + last_temperatures[ind - 1][1]) / 2;
+                                // get average 3 days before that
+                                let past_avg_temp = 0;
+                                past_avg_temp += last_temperatures[ind - 3][1];
+                                past_avg_temp += last_temperatures[ind - 4][1];
+                                past_avg_temp += last_temperatures[ind - 5][1];
+                                past_avg_temp /= 3;
 
-                            // get average 3 days before that
-                            let past_avg_temp = 0;
-                            past_avg_temp += last_temperatures[ind - 3][1];
-                            past_avg_temp += last_temperatures[ind - 4][1];
-                            past_avg_temp += last_temperatures[ind - 5][1];
-                            past_avg_temp /= 3;
-
-                            // check if temp has risen
-                            if (days_between(curr_date, last_temperatures[ind - 4][0]) < 8) {
-                                let diff = recent_avg_temp - past_avg_temp;
-                                if (diff > 0.4) {
-                                    override_level = 4;
-                                    ovulation_index = j - 2;
-                                    console.log("bb temp ovulation detected " + date_to_str(curr_date));
+                                // check if temp has risen
+                                if (days_between(curr_date, last_temperatures[ind - 4][0]) < 8) {
+                                    let diff = recent_avg_temp - past_avg_temp;
+                                    if (diff > 0.4) {
+                                        override_level = 4;
+                                        ovulation_index = j - 2;
+                                        console.log("bb temp ovulation detected " + date_to_str(curr_date));
+                                    }
                                 }
+
                             }
 
                         }
 
                     }
-
                 }
             }
+            
 
             // mark out days
             for (let o = ovulation_index - 5; o < ovulation_index; o++) {
@@ -641,6 +651,8 @@
 
                 // collect all events per day
                 let history_length_days = days_between(new Date(events_list[0][0]), curr_date);
+                if (history_length_days < 0) return;
+
                 let event_days = new Array(history_length_days).fill(null);
                 let first_date = new Date(events_list[0][0]);
                 for (let date_and_events of events_list) {
@@ -697,13 +709,6 @@
                         }
                     }
                     else {
-                        // period has ended
-                        if (consecutive_bleeding > 2) {
-                            period_durations.push(consecutive_bleeding);
-                            last_period_start_index = current_period_start_index;
-                            current_period_start_index = null;
-                            consecutive_bleeding = 0;
-                        }
 
                         if (event == "positive_pregnancy_test" || event == "faintly_positive_pregnancy_test") {
                             positive_pregnancy_test = [i, event];
@@ -712,6 +717,14 @@
                         if (event == "negative_pregnancy_test") {
                             positive_pregnancy_test = null;
                         }
+                    }
+                    
+                    // period has ended
+                    if (consecutive_bleeding > 2) {
+                        period_durations.push(consecutive_bleeding);
+                        last_period_start_index = current_period_start_index;
+                        current_period_start_index = null;
+                        consecutive_bleeding = 0;
                     }
                 }
 
@@ -743,7 +756,7 @@
                 }
 
                 // if ovulation before next period
-                if (days_until_next_period < avg_ovulation_symptoms_to_period_start) {
+                if (days_until_next_period < avg_ovulation_symptoms_to_period_start && days_since_last_period < avg_cycle_lenght) {
                     let days_until_ovulation = event_days.length + days_until_next_period - avg_ovulation_symptoms_to_period_start;
                     mark_out_ovulation_days(event_days, curr_date, days_until_ovulation, 0);
                 }
@@ -789,23 +802,22 @@
                     // predict out periods and ovulations for the next 10 cycles
                     for (let p = 0; p < 10; p++) {
 
+                        // ovulation
+                        let days_until_ovulation = days_until_next_period + p * avg_cycle_lenght - avg_ovulation_symptoms_to_period_start;
+                        if (days_until_ovulation > 0) {
+                            mark_out_ovulation_days(event_days, curr_date, days_until_ovulation + event_days.length, -1);
+                        }
+
                         // period
                         let period_date = new Date(next_period_date);
                         period_date.setDate(period_date.getDate() + p * avg_cycle_lenght);
+                        predictions.set(date_to_str(period_date), "period_start");
                         for (let i = 0; i < avg_period_duration; i++) {
-                            predictions.set(date_to_str(period_date), "period");
                             period_date.setDate(period_date.getDate() + 1);
-                            if (i == days_until_ovulation_start - 5) {
-                                predictions.set(date_to_str(ovulation_date), "period_start");
-                            }
-                            else if (i == days_until_ovulation_start) {
-                                predictions.set(date_to_str(ovulation_date), "period_end");
-                            }
+                            predictions.set(date_to_str(period_date), "period");
                         }
+                        predictions.set(date_to_str(period_date), "period_end");
 
-                        // ovulation
-                        let days_until_ovulation = days_until_next_period + p * avg_cycle_lenght - avg_ovulation_symptoms_to_period_start;
-                        mark_out_ovulation_days(event_days, curr_date, days_until_ovulation, 0);
                     }
                 }
 
@@ -1224,12 +1236,93 @@
 
                     }
                     else if (prediction == "period_start") {
+                        let text = curr_date.getDate() + " period start";
+                        let color = "rgba(224, 133, 215, 0.5)";
+                        let background_color = "rgba(224, 133, 215, 0.2)";
+
+                        // background
+                        ctx.fillStyle = background_color;
+                        ctx.fillRect(x, Y_MARGIN, step_x, graph_canvas.height - Y_MARGIN - Y_MARGIN_TOP);
+
+                        // flag
+                        draw_flag(ctx, text, x, color, background_color, true);
+
+                        ctx.beginPath();
+                        ctx.setLineDash([5, 5]);
+                        ctx.lineWidth = 1;
+                        ctx.strokeStyle = color;
+
+                        // up down line
+                        ctx.moveTo(x, Y_MARGIN);
+                        ctx.lineTo(x, graph_canvas.height - Y_MARGIN_TOP);
+                        ctx.stroke();
+
+                        // top bottom lines
+                        ctx.moveTo(x, Y_MARGIN);
+                        ctx.lineTo(x + step_x, Y_MARGIN);
+                        ctx.stroke();
+                        ctx.moveTo(x, graph_canvas.height - Y_MARGIN_TOP);
+                        ctx.lineTo(x + step_x, graph_canvas.height - Y_MARGIN_TOP);
+                        ctx.stroke();
+
+                        ctx.setLineDash([]);
 
                     }
                     else if (prediction == "period") {
+                        let color = "rgba(224, 133, 215,0.5)";
+                        let background_color = "rgba(224, 133, 215,0.2)";
+
+                        // background
+                        ctx.fillStyle = background_color;
+                        ctx.fillRect(x, Y_MARGIN, step_x, graph_canvas.height - Y_MARGIN - Y_MARGIN_TOP);
+
+                        ctx.beginPath();
+                        ctx.setLineDash([5, 5]);
+                        ctx.lineWidth = 1;
+                        ctx.strokeStyle = color;
+
+                        // top bottom lines
+                        ctx.moveTo(x, Y_MARGIN);
+                        ctx.lineTo(x + step_x, Y_MARGIN);
+                        ctx.stroke();
+                        ctx.moveTo(x, graph_canvas.height - Y_MARGIN_TOP);
+                        ctx.lineTo(x + step_x, graph_canvas.height - Y_MARGIN_TOP);
+                        ctx.stroke();
+
+                        ctx.setLineDash([]);
 
                     }
                     else if (prediction == "period_end") {
+                        let text = curr_date.getDate() + " period end";
+                        let color = "rgba(224, 133, 215, 0.5)";
+                        let background_color = "rgba(224, 133, 215,0.2)";
+
+                        // background
+                        ctx.fillStyle = background_color;
+                        ctx.fillRect(x, Y_MARGIN, step_x, graph_canvas.height - Y_MARGIN - Y_MARGIN_TOP);
+
+                        // flag
+                        draw_flag(ctx, text, x + step_x, color, background_color, true);
+
+                        ctx.beginPath();
+                        ctx.setLineDash([5, 5]);
+                        ctx.lineWidth = 1;
+                        ctx.strokeStyle = color;
+
+                        // up down line
+                        ctx.moveTo(x + step_x, Y_MARGIN);
+                        ctx.lineTo(x + step_x, graph_canvas.height - Y_MARGIN_TOP);
+                        ctx.stroke();
+
+                        // top bottom lines
+                        ctx.moveTo(x, Y_MARGIN);
+                        ctx.lineTo(x + step_x, Y_MARGIN);
+                        ctx.stroke();
+                        ctx.moveTo(x, graph_canvas.height - Y_MARGIN_TOP);
+                        ctx.lineTo(x + step_x, graph_canvas.height - Y_MARGIN_TOP);
+                        ctx.stroke();
+
+                        ctx.setLineDash([]);
 
                     }
                     // baby size
@@ -1351,18 +1444,92 @@
 
 
         // startup
-        events = local_storage_get("events");
+        events = local_storage_get_map("events");
         if (!events || bb_temperatures.length == 0) events = new Map();
-        bb_temperatures = local_storage_get("bb_temperatures");
+        bb_temperatures = local_storage_get_map("bb_temperatures");
         if (!bb_temperatures || bb_temperatures.length == 0) bb_temperatures = new Map();
         make_predictions(events, bb_temperatures);
-        draw_graph(START_DATE, bb_temperatures, events, predictions);
+        draw_graph(START_DATE, bb_temperatures, events);
 
     </script>
 
 
+    <!-- downalod upload -->
+    <script>
+
+        function download_data() {
+
+            let csv_content = [];
+
+            for (let entry of events.entries()) {
+                let date = entry[0];
+                let events_on_date = entry[1];
+
+                for (let i = events_on_date.length - 1; i >= 0; i--) {
+                    let event = events_on_date[i];
+                    csv_content.push([date, event].join(","));
+                }
+            }
+
+            for (let entry of bb_temperatures.entries()) {
+                let date = entry[0];
+                let temp = entry[1];
+                csv_content.push([date, "bb_temperature", temp].join(","));
+            }
 
 
+            let csv_string = csv_content.join("\n");
+            let blob = new Blob([csv_string], { type: 'text/csv' });
+            let url = URL.createObjectURL(blob);
+            let a = document.createElement('a');
+            a.href = url;
+            a.download = 'period_tracker_data.csv';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+
+        function upload_data() {
+            let input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.csv';
+            input.onchange = e => {
+                let file = e.target.files[0];
+                let reader = new FileReader();
+                reader.onload = event => {
+
+                    bb_temperatures.clear();
+                    events.clear();
+
+                    let text = event.target.result;
+                    let lines = text.split('\n');
+                    for (let line of lines) {
+                        let parts = line.split(',');
+                        if (parts.length >= 2) {
+                            let date = parts[0];
+                            let event = parts[1];
+                            if (event == "bb_temperature" && parts.length == 3) {
+                                let temp = parseFloat(parts[2]);
+                                bb_temperatures.set(date, temp);
+                            }
+                            else {
+                                add_to_list_map(events, date, event);
+                            }
+                        }
+                    }
+                    local_storage_save("events", events);
+                    local_storage_save("bb_temperatures", bb_temperatures);
+                    make_predictions(events, bb_temperatures);
+                    draw_graph(START_DATE, bb_temperatures, events, predictions);
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+    </script>
 
 
 
