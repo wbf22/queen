@@ -902,7 +902,7 @@
         let GRAPH_DAY_WIDTH_PIXELS = window.innerWidth <= 1024 ? 12 : 22;
         window.addEventListener('resize', () => {
             FONT_SIZE = window.innerWidth <= 1024 ? 24 : 30;
-            GRAPH_DAY_WIDTH_PIXELS = window.innerWidth <= 1024 ? 6 : 11;
+            GRAPH_DAY_WIDTH_PIXELS = window.innerWidth <= 1024 ? 12 : 22;
             draw_graph(START_DATE, bb_temperatures, events);
         });
         
@@ -1499,8 +1499,7 @@
             
 
             // Use data URL instead of blob URL for better mobile support
-            let bom = '\uFEFF';
-            let data_uri = 'data:text/csv;charset=utf-8,' + encodeURIComponent(bom + csv_string);
+            let data_uri = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv_string);
             
             let a = document.createElement('a');
             a.href = data_uri;
