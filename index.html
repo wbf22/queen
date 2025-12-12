@@ -471,6 +471,7 @@
             const date_str = date_to_str(SELECTED_DATE);
             events.delete(date_str);
             bb_temperatures.delete(date_str);
+            make_predictions(events, bb_temperatures);
             draw_graph(START_DATE, bb_temperatures, events);
 
 
@@ -647,6 +648,7 @@
                 .sort((a, b) => new Date(a[0]) - new Date(b[0])); // sort by date
 
             if (events_list.length > 0) {
+                is_pregnant = false;
                 let curr_date = time_less_date_today();
 
                 // collect all events per day
@@ -702,13 +704,23 @@
                                 }
                             }
 
+                        }
+                    }
+                    else {
+
+                        // period has ended
+                        if (consecutive_bleeding > 2) {
                             // look back for ovulation (and predict past ovulations)
                             ovulation_index = current_period_start_index - avg_ovulation_symptoms_to_period_start;
                             mark_out_ovulation_days(event_days, curr_date, ovulation_index, 3);
 
+                            // reset for next period
+                            period_durations.push(consecutive_bleeding);
+                            last_period_start_index = current_period_start_index;
+                            current_period_start_index = null;
+                            consecutive_bleeding = 0;
+
                         }
-                    }
-                    else {
 
                         if (event == "positive_pregnancy_test" || event == "faintly_positive_pregnancy_test") {
                             positive_pregnancy_test = [i, event];
@@ -717,14 +729,6 @@
                         if (event == "negative_pregnancy_test") {
                             positive_pregnancy_test = null;
                         }
-                    }
-                    
-                    // period has ended
-                    if (consecutive_bleeding > 2) {
-                        period_durations.push(consecutive_bleeding);
-                        last_period_start_index = current_period_start_index;
-                        current_period_start_index = null;
-                        consecutive_bleeding = 0;
                     }
                 }
 
@@ -756,7 +760,7 @@
                 }
 
                 // if ovulation before next period
-                if (days_until_next_period < avg_ovulation_symptoms_to_period_start && days_since_last_period < avg_cycle_lenght) {
+                if (days_until_next_period < avg_ovulation_symptoms_to_period_start) {
                     let days_until_ovulation = event_days.length + days_until_next_period - avg_ovulation_symptoms_to_period_start;
                     mark_out_ovulation_days(event_days, curr_date, days_until_ovulation, 0);
                 }
@@ -847,30 +851,37 @@
                         }
                         index--;
                     }
+
+
                     let conception_date = get_date_plus_days(first_date, index);
                     predictions.set(date_to_str(conception_date), "conception_date")
 
 
                     // mark expected due date
                     let due_date = get_date_plus_days(conception_date, 266);
-                    predictions.set(date_to_str(due_date), "due_date")
 
-                    // baby sizes if over 15 weeks
-                    if (index > 15 * 7) {
-                        let week15 = get_date_plus_days(conception_date, 15 * 7);
-                        let week20 = get_date_plus_days(conception_date, 20 * 7);
-                        let week25 = get_date_plus_days(conception_date, 25 * 7);
-                        let week30 = get_date_plus_days(conception_date, 30 * 7);
-                        let week35 = get_date_plus_days(conception_date, 35 * 7);
-                        let week40 = get_date_plus_days(conception_date, 40 * 7);
+                    const options = { month: 'short', year: 'numeric' };
+                    const formatted = new Intl.DateTimeFormat('en-US', options).format(due_date);
+                    predictions.set(date_to_str(due_date), formatted + " due date 🎉")
 
-                        predictions.set(week15, "baby is a 🍎");
-                        predictions.set(week20, "baby is a 🍌");
-                        predictions.set(week25, "baby is a 🍈");
-                        predictions.set(week30, "baby is a 🍆");
-                        predictions.set(week35, "baby is a 🍍");
-                        predictions.set(week40, "baby is a 🏀");
-                    }
+                    // baby sizes if over 6 weeks
+                    let week6 = get_date_plus_days(conception_date, 6 * 7 - avg_ovulation_symptoms_to_period_start);
+                    let week10 = get_date_plus_days(conception_date, 10 * 7 - avg_ovulation_symptoms_to_period_start);
+                    let week15 = get_date_plus_days(conception_date, 15 * 7 - avg_ovulation_symptoms_to_period_start);
+                    let week20 = get_date_plus_days(conception_date, 20 * 7 - avg_ovulation_symptoms_to_period_start);
+                    let week25 = get_date_plus_days(conception_date, 25 * 7 - avg_ovulation_symptoms_to_period_start);
+                    let week30 = get_date_plus_days(conception_date, 30 * 7 - avg_ovulation_symptoms_to_period_start);
+                    let week35 = get_date_plus_days(conception_date, 35 * 7 - avg_ovulation_symptoms_to_period_start);
+                    let week40 = get_date_plus_days(conception_date, 39 * 7 - avg_ovulation_symptoms_to_period_start);
+
+                    predictions.set(date_to_str(week6), "baby is a 🍬");
+                    predictions.set(date_to_str(week10), "baby is a 🍓");
+                    predictions.set(date_to_str(week15), "baby is a 🍎");
+                    predictions.set(date_to_str(week20), "baby is a 🍌");
+                    predictions.set(date_to_str(week25), "baby is a 🍈");
+                    predictions.set(date_to_str(week30), "baby is a 🍆");
+                    predictions.set(date_to_str(week35), "baby is a 🍍");
+                    predictions.set(date_to_str(week40), "baby is a 🏀");
 
 
 
@@ -1232,9 +1243,6 @@
                         ctx.setLineDash([]);
 
                     }
-                    else if (prediction == "due_date") {
-
-                    }
                     else if (prediction == "period_start") {
                         let text = curr_date.getDate() + " period start";
                         let color = "rgba(224, 133, 215, 0.5)";
@@ -1327,7 +1335,7 @@
                     }
                     // baby size
                     else {
-
+                        draw_flag(ctx, prediction, x, "rgba(255, 165, 0, 1.0)", "rgba(255, 165, 0, 0.3)", false);
                     }
                 }
 
@@ -1435,6 +1443,7 @@
         function drag_end(e) {
             isDragging = false;
         }
+        
         graph_canvas.addEventListener("touchstart", drag_start);
         graph_canvas.addEventListener("touchmove", drag_move);
         graph_canvas.addEventListener("touchend", drag_end);
