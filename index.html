@@ -13,7 +13,6 @@
             background-color: rgb(255, 255, 255);
             margin: 0px;
             padding: 0px;
-
             overflow-x: hidden;
         }
 
@@ -31,7 +30,6 @@
             min-height: 100vh;
             font-family: Montserrat;
             color: rgb(224, 133, 215);
-
             overflow-x: hidden;
             overscroll-behavior-x: none;
         }
@@ -67,14 +65,10 @@
             padding: 1rem;
         }
 
-        #element_26cf65e584e24d92 {
-            width: 60vw;
-            margin: 2rem;
-        }
-
         #element_f2868fccda224bd3 {
             display: flex;
             grid-template-columns: 1fr 4fr;
+            align-items: center;
         }
 
         #element_265b987ceb254fe9 {
@@ -87,6 +81,7 @@
             place-self: center start;
             border: 2px solid rgb(224, 133, 215);
             border-radius: 5px;
+            width: 4rem;
         }
 
         #title {
@@ -115,7 +110,7 @@
             padding: 0.5rem;
             background-color: rgb(224, 133, 215);
             width: 10rem;
-            margin: 0rem 1rem;
+            margin: 0rem 1rem 1rem;
             color: rgb(255, 255, 255);
             font-size: 1.2rem;
         }
@@ -140,6 +135,7 @@
             color: rgb(224, 133, 215);
             margin: 0rem 1rem;
             width: 10rem;
+            height: 3rem;
         }
 
         .upload_download {
@@ -168,19 +164,6 @@
             padding: 1rem;
         }
 
-        #element_7e8168c4524f4645 {
-            margin: 1rem 0rem;
-        }
-
-        #element_e677238f138543b7 {
-            padding: 0.5rem;
-            background-color: rgb(224, 133, 215);
-            width: 10rem;
-            margin: 0rem 1rem;
-            color: rgb(255, 255, 255);
-            font-size: 1.2rem;
-        }
-
         #element_f6680eb128e546c5 {
             display: flex;
             grid-template-columns: 1fr 4fr;
@@ -193,12 +176,6 @@
             margin: 0rem;
             width: 50%;
         }
-
-
-
-
-
-
 
         #element_efaf3ab7083e4edb {
             padding: 1rem;
@@ -217,11 +194,9 @@
             margin: 0px;
         }
 
-        @media (max-width: 1024px) {
-            #element_26cf65e584e24d92 {
-                width: 90vw;
-            }
 
+
+        @media (max-width: 1024px) {
             #canvas_container {
                 width: 90vw;
             }
@@ -257,67 +232,68 @@
     <div id="main_section">
         <div id="element_3d30a70ff1c4447d">
             <div id="canvas_container">
-                <canvas id="graph_canvas" width="715" height="326"></canvas>
+                <canvas id="graph_canvas" width="1431" height="652"></canvas>
             </div>
 
 
             <div id="element_efaf3ab7083e4edb">
                 <div id="element_2de4c3a381154501">
-                    <p id="date_label">Nov 21</p>
+                    <p id="date_label">Jan 17</p>
                 </div>
                 <div id="element_cfd65f4507ba4e9e">
-                    <button id="clear_events" class="pink_border"
-                        onclick="clear_events()">Clear</button>
+                    <button id="clear_events" class="pink_border" onclick="clear_events()">Clear</button>
                     <button id="upload_button" class="upload_download pink_border">upload</button>
-                    <button id="dowload_button" onclick="download_data()" class="upload_download pink_border">download</button>
+                    <button id="dowload_button" onclick="download_data()"
+                        class="upload_download pink_border">download</button>
                 </div>
             </div>
         </div>
         <div id="element_b53e0e1d5ebd48ae">
             <h2 id="element_7e557ad4033c45e2">Log Event</h2>
-            <select id="event_type_dropdown">
-                <option id="element_858cce4c95524e10" value="very_heavy_bleeding">very heavy bleeding</option>
-                <option id="element_0849c3d19e254d31" value="heavy_bleeding">heavy bleeding</option>
-                <option id="element_0849c3d19e254d31" value="medium_bleeding">medium bleeding</option>
-                <option id="element_0849c3d19e254d31" value="light_bleeding">light bleeding</option>
-                <option id="element_c4ebd0ed321341be" value="spotting">spotting</option>
-                <option id="element_4693fc43131b4716" value="positive_pregnancy_test">positive pregnancy test</option>
-                <option id="element_4693fc43131b4716" value="faintly_positive_pregnancy_test">faintly positive pregnancy
-                    test</option>
-                <option id="element_4693fc43131b4716" value="negative_pregnancy_test">negative pregnancy test</option>
-                <option id="element_4693fc43131b4716" value="fatigue">fatigue</option>
-                <option id="element_4693fc43131b4716" value="tender_breasts">tender breasts</option>
-                <option id="element_4693fc43131b4716" value="cramps">cramps</option>
-                <option id="element_4693fc43131b4716" value="positive_ovulation_test">positive ovulation test</option>
-                <option id="element_4693fc43131b4716" value="faintly_positive_ovulation_test">faintly positive ovulation
-                    test</option>
-                <option id="element_4693fc43131b4716" value="negative_ovulation_test">negative ovulation test</option>
-                <option id="element_4693fc43131b4716" value="clearer_slippery_mucus">clear slippery mucus</option>
-                <option id="element_4693fc43131b4716" value="sticky_or_thicker_mucus">sticky or thicker mucus</option>
-                <option id="element_4693fc43131b4716" value="sick">sick</option>
-                <option id="element_4693fc43131b4716" value="stress">stress</option>
-            </select>
-            <input id="event_date_select" class="date_select" type="date">
+            <div id="element_f6680eb128e546c5">
+                <p id="element_a6eb3033d01144ad">Date</p>
+                <input id="event_date_select" class="date_select" type="date">
+            </div>
+            <div id="element_f2868fccda224bd3">
+                <p id="element_265b987ceb254fe9">Basel Body Temp</p>
+                <input id="temp_input" type="">
+            </div>
+            <div id="element_f2868fccda224bd3">
+                <p id="element_265b987ceb254fe9">Event</p>
+                <select id="event_type_dropdown">
+                    <option id="element_858cce4c95524e10" value="no_event"></option>
+                    <option id="element_858cce4c95524e10" value="very_heavy_bleeding">very heavy bleeding</option>
+                    <option id="element_0849c3d19e254d31" value="heavy_bleeding">heavy bleeding</option>
+                    <option id="element_0849c3d19e254d31" value="medium_bleeding">medium bleeding</option>
+                    <option id="element_0849c3d19e254d31" value="light_bleeding">light bleeding</option>
+                    <option id="element_c4ebd0ed321341be" value="spotting">spotting</option>
+                    <option id="element_4693fc43131b4716" value="positive_pregnancy_test">positive pregnancy test
+                    </option>
+                    <option id="element_4693fc43131b4716" value="faintly_positive_pregnancy_test">faintly positive
+                        pregnancy
+                        test</option>
+                    <option id="element_4693fc43131b4716" value="negative_pregnancy_test">negative pregnancy test
+                    </option>
+                    <option id="element_4693fc43131b4716" value="fatigue">fatigue</option>
+                    <option id="element_4693fc43131b4716" value="tender_breasts">tender breasts</option>
+                    <option id="element_4693fc43131b4716" value="cramps">cramps</option>
+                    <option id="element_4693fc43131b4716" value="positive_ovulation_test">positive ovulation test
+                    </option>
+                    <option id="element_4693fc43131b4716" value="faintly_positive_ovulation_test">faintly positive
+                        ovulation
+                        test</option>
+                    <option id="element_4693fc43131b4716" value="negative_ovulation_test">negative ovulation test
+                    </option>
+                    <option id="element_4693fc43131b4716" value="clearer_slippery_mucus">clear slippery mucus</option>
+                    <option id="element_4693fc43131b4716" value="sticky_or_thicker_mucus">sticky or thicker mucus
+                    </option>
+                    <option id="element_4693fc43131b4716" value="sick">sick</option>
+                    <option id="element_4693fc43131b4716" value="stress">stress</option>
+                </select>
+
+            </div>
             <button id="submit_event" class="pink_border" onclick="submit_event()">Submit</button>
 
-        </div>
-        <div id="element_26cf65e584e24d92">
-            <h2 id="element_fde29288b6384ae3">Log Basal Body Temperature</h2>
-            <div id="element_f2868fccda224bd3">
-                <p id="element_265b987ceb254fe9">Temp</p>
-                <input id="temp_input" type="">
-
-
-
-            </div>
-            <div id="element_f6680eb128e546c5">
-
-
-                <p id="element_a6eb3033d01144ad">Date</p>
-                <input id="temp_date_select" class="date_select" type="date">
-
-            </div>
-            <button id="element_e677238f138543b7" class="pink_border" onclick="submit_temp()">Submit</button>
         </div>
     </div>
 
@@ -384,7 +360,7 @@
         function local_storage_get_map(key) {
             const stored = localStorage.getItem(key);
             if (!stored) return new Map();
-            
+
             const obj = JSON.parse(stored);
             return new Map(obj);
         }
@@ -446,6 +422,7 @@
         let SELECTED_DATE = null;
 
         let event_type_dropdown = document.getElementById("event_type_dropdown");
+        let temp_input = document.getElementById("temp_input");
         let graph_canvas = document.getElementById("graph_canvas");
         const ctx = graph_canvas.getContext('2d');
 
@@ -456,12 +433,35 @@
             // add to graph
             const date = time_less_date_from_calendar(document.getElementById("event_date_select"));
             const date_str = date_to_str(date);
-            add_to_list_map(events, date_str, event_type_dropdown.value);
+            if (event_type_dropdown.value) {
+                add_to_list_map(events, date_str, event_type_dropdown.value);
+            }
+
+
+            const temp_str = document.getElementById("temp_input").value;
+            if (temp_str) {
+                const temp = parseFloat(temp_str);
+
+                if (temp > 104 || temp < 92) {
+                    alert("That temperature is strange: " + temp + " F\n\n(not celcius) If that's really your temperature you should see a doctor.");
+                }
+                else {
+                    // add to graph
+                    bb_temperatures.set(
+                        date_to_str(date),
+                        temp
+                    );
+                }
+
+            }
+
+            // update graph
             make_predictions(events, bb_temperatures);
             draw_graph(START_DATE, bb_temperatures, events);
 
             // add to local storage
             local_storage_save("events", events);
+            local_storage_save("bb_temperatures", bb_temperatures);
         }
 
         function clear_events() {
@@ -476,32 +476,6 @@
             // remove from local storage
             local_storage_save("events", events);
             local_storage_save("bb_temperatures", bb_temperatures);
-        }
-
-        function submit_temp() {
-
-            const temp = parseFloat(document.getElementById("temp_input").value);
-
-            if (temp > 104 || temp < 92) {
-                alert("That temperature is strange: " + temp + " F\n\n(not celcius) If that's really your temperature you should see a doctor.")
-                return;
-            }
-
-
-            const date = time_less_date_from_calendar(document.getElementById("temp_date_select"));
-
-
-            // add to graph
-            bb_temperatures.set(
-                date_to_str(date),
-                temp
-            );
-            make_predictions(events, bb_temperatures);
-            draw_graph(START_DATE, bb_temperatures, events);
-
-            // add to local storage
-            local_storage_save("bb_temperatures", bb_temperatures);
-
         }
 
         function is_bleeding(event) {
@@ -575,7 +549,7 @@
                     }
                 }
             }
-            
+
 
             // mark out days
             for (let o = ovulation_index - 5; o < ovulation_index; o++) {
@@ -905,7 +879,7 @@
             GRAPH_DAY_WIDTH_PIXELS = window.innerWidth <= 1024 ? 12 : 22;
             draw_graph(START_DATE, bb_temperatures, events);
         });
-        
+
         let Y_MARGIN = 40;
         let Y_MARGIN_TOP = 80;
         let BB_MARGIN = 20;
@@ -1023,7 +997,11 @@
                     // set date inputs
                     const date_str = SELECTED_DATE.toISOString().split('T')[0];
                     document.getElementById("event_date_select").value = date_str;
-                    document.getElementById("temp_date_select").value = date_str;
+
+                    const date_key = date_to_str(SELECTED_DATE);
+                    temp_input.value = bb_temperatures.has(date_key) ? bb_temperatures.get(date_key) : "";
+
+                    event_type_dropdown.value = events.has(date_key) ? events.get(date_key)[0] : "";
                 }
 
 
@@ -1431,6 +1409,8 @@
                 if (Math.abs(dx) > GRAPH_DAY_WIDTH_PIXELS) {
                     isDragging = true;
                     // console.log("sliding", dx, dy);
+
+                    // draw graph
                     START_DATE = get_date_plus_days(START_DATE, -dx / GRAPH_DAY_WIDTH_PIXELS)
                     draw_graph(START_DATE, bb_temperatures, events);
                     if (e.touches) {
@@ -1442,6 +1422,7 @@
                     }
 
 
+
                 }
 
             }
@@ -1450,7 +1431,7 @@
         function drag_end(e) {
             isDragging = false;
         }
-        
+
         graph_canvas.addEventListener("touchstart", drag_start);
         graph_canvas.addEventListener("touchmove", drag_move);
         graph_canvas.addEventListener("touchend", drag_end);
@@ -1496,11 +1477,11 @@
 
 
             let csv_string = csv_content.join("\n");
-            
+
 
             // Use data URL instead of blob URL for better mobile support
             let data_uri = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv_string);
-            
+
             let a = document.createElement('a');
             a.href = data_uri;
             a.download = 'period_tracker_data.csv';
@@ -1547,6 +1528,8 @@
         }
 
     </script>
+
+
 
 
 
