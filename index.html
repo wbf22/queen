@@ -45,14 +45,14 @@
 
         #canvas_container {
             border-radius: 5px;
-            border: 2px solid rgb(224, 133, 215);
             height: 40vh;
-            width: 60vw;
             margin: 2rem 0rem 0rem;
+            display: flex;
+            width: 90vw;
         }
 
         #element_b53e0e1d5ebd48ae {
-            width: 60vw;
+            width: 90vw;
             display: flex;
             flex-direction: column;
         }
@@ -82,6 +82,7 @@
             border: 2px solid rgb(224, 133, 215);
             border-radius: 5px;
             width: 4rem;
+            color: rgb(224, 133, 215);
         }
 
         #title {
@@ -98,12 +99,12 @@
         }
 
         .date_select {
-            padding: 1rem;
-            margin: 1rem;
             border: 2px solid rgb(224, 133, 215);
             border-radius: 5px;
             width: 10rem;
             color: rgb(224, 133, 215);
+            padding: 1rem;
+            margin: 1rem;
         }
 
         #submit_event {
@@ -150,6 +151,8 @@
         #graph_canvas {
             height: 40vh;
             width: 60vw;
+            border: 2px solid;
+            border-radius: 5px;
         }
 
         #clear_events {
@@ -172,7 +175,7 @@
         #element_cfd65f4507ba4e9e {
             padding: 0rem;
             display: flex;
-            justify-content: end;
+            justify-content: start;
             margin: 0rem;
             width: 50%;
         }
@@ -183,22 +186,75 @@
             justify-content: start;
         }
 
-        #element_2de4c3a381154501 {
-            padding: 0rem;
-            width: 50%;
-            margin: 0px;
-        }
-
         #date_label {
+            margin: 0rem;
+            background-color: rgb(224, 133, 215);
+            color: rgb(247, 247, 247);
+            padding: 0.5rem;
+            border-radius: 5px;
+        }
+
+        #day_events {
+            padding: 1rem;
+            border: 2px solid;
+            border-radius: 5px;
+            width: 20vw;
+            margin: 0rem 0rem 0rem 1rem;
+        }
+
+        #element_6ac56891106e444a {
+            padding: 0rem;
+            display: flex;
+            margin: 1rem 0rem 0rem;
+        }
+
+        #element_8a61cd457c604b3b {
             padding: 0rem;
             margin: 0px;
         }
 
+        #bb_temp_label {
+            padding: 0rem;
+            color: rgb(223, 190, 220);
+            margin: 0rem 0rem 0rem 1rem;
+        }
+
+        #element_afcebe5e5f37459d {
+            padding: 0rem;
+            white-space: pre-wrap;
+            margin: 1rem 0rem 0rem;
+            line-height: 1rem;
+        }
+
+        #element_a1197bce6a994149 {
+            padding: 0rem;
+            display: flex;
+            margin: 0px;
+            flex-direction: column;
+        }
+
+        #event_tags {
+            padding: 0rem 1rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+
+        .event_tag {
+            padding: 0.3rem;
+            background-color: rgb(162, 206, 221);
+            color: rgb(255, 255, 255);
+            font-size: 0.8rem;
+            margin: 0.3rem;
+            border-radius: 5px;
+            cursor: pointer;
+        }
 
 
         @media (max-width: 1024px) {
             #canvas_container {
                 width: 90vw;
+                flex-direction: column;
+                height: 60vh;
             }
 
             #graph_canvas {
@@ -207,6 +263,12 @@
 
             #element_b53e0e1d5ebd48ae {
                 width: 90vw;
+            }
+
+            #day_events {
+                margin: 1rem 0rem;
+                width: 90vw;
+                box-sizing: border-box;
             }
         }
     </style>
@@ -232,14 +294,25 @@
     <div id="main_section">
         <div id="element_3d30a70ff1c4447d">
             <div id="canvas_container">
-                <canvas id="graph_canvas" width="1431" height="652"></canvas>
+                <canvas id="graph_canvas" width="1439" height="660"></canvas>
+                <div id="day_events">
+                    <p id="date_label">Jan 8</p>
+                    <div id="element_6ac56891106e444a">
+                        <p id="element_8a61cd457c604b3b">BB Temp</p>
+                        <p id="bb_temp_label">98.5</p>
+                    </div>
+                    <div id="element_a1197bce6a994149">
+                        <p id="element_afcebe5e5f37459d">Events
+                        </p>
+                        <div id="event_tags">
+                            <div class="event_tag">x &nbsp;&nbsp;&nbsp; Cramps </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-
             <div id="element_efaf3ab7083e4edb">
-                <div id="element_2de4c3a381154501">
-                    <p id="date_label">Jan 17</p>
-                </div>
+
                 <div id="element_cfd65f4507ba4e9e">
                     <button id="clear_events" class="pink_border" onclick="clear_events()">Clear</button>
                     <button id="upload_button" class="upload_download pink_border">upload</button>
@@ -255,7 +328,7 @@
                 <input id="event_date_select" class="date_select" type="date">
             </div>
             <div id="element_f2868fccda224bd3">
-                <p id="element_265b987ceb254fe9">Basel Body Temp</p>
+                <p id="element_265b987ceb254fe9">Basal Body Temp</p>
                 <input id="temp_input" type="">
             </div>
             <div id="element_f2868fccda224bd3">
@@ -454,6 +527,25 @@
                 }
 
             }
+
+            // update graph
+            make_predictions(events, bb_temperatures);
+            draw_graph(START_DATE, bb_temperatures, events);
+
+            // add to local storage
+            local_storage_save("events", events);
+            local_storage_save("bb_temperatures", bb_temperatures);
+        }
+
+        function remove_event(event, date_key) {
+
+            // remove from events
+            let elements = events.get(date_key);
+            events.set(
+                date_key,
+                elements.filter(item => item != event)
+            );
+
 
             // update graph
             make_predictions(events, bb_temperatures);
@@ -874,6 +966,8 @@
 
         let FONT_SIZE = window.innerWidth <= 1024 ? 24 : 30;
         let GRAPH_DAY_WIDTH_PIXELS = window.innerWidth <= 1024 ? 12 : 22;
+        let POINT_SIZE = 8;
+        let LINE_THICKNESS = 5;
         window.addEventListener('resize', () => {
             FONT_SIZE = window.innerWidth <= 1024 ? 24 : 30;
             GRAPH_DAY_WIDTH_PIXELS = window.innerWidth <= 1024 ? 12 : 22;
@@ -1002,6 +1096,27 @@
                     temp_input.value = bb_temperatures.has(date_key) ? bb_temperatures.get(date_key) : "";
 
                     event_type_dropdown.value = events.has(date_key) ? events.get(date_key)[0] : "";
+
+                    // set side view values
+                    const bb_temp_label = document.getElementById("bb_temp_label");
+                    bb_temp_label.textContent = temp_input.value;
+
+                    const event_tags = document.getElementById("event_tags");
+                    event_tags.replaceChildren();
+                    if (events.has(date_key)) {
+                        let events_for_day = events.get(date_key);
+                        for (let event of events_for_day) {
+                            if (event != "no_event") {
+                                const ele = document.createElement("div");
+                                ele.className = "event_tag";
+                                ele.innerHTML = `x &nbsp;&nbsp;&nbsp; ${event.replaceAll("_", " ")}`;
+                                event_tags.appendChild(ele);
+                                ele.addEventListener("click", () => {
+                                    remove_event(event, date_key);
+                                });
+                            }
+                        }
+                    }
                 }
 
 
@@ -1012,7 +1127,7 @@
                     temperatures.push([new Date(curr_date), temp]);
                     let y = graph_canvas.height - BB_MARGIN - step_y * (temp - min_temp);
                     ctx.beginPath();
-                    ctx.arc(x, y, 2.5, 0, Math.PI * 2); // full circle
+                    ctx.arc(x, y, POINT_SIZE, 0, Math.PI * 2); // full circle
                     ctx.fillStyle = 'rgb(224, 133, 215)'; // color of the dot
                     ctx.fill();
 
@@ -1021,7 +1136,7 @@
                         ctx.moveTo(last_temp_x, last_temp_y);
                         ctx.lineTo(x, y);
                         ctx.strokeStyle = 'rgb(224, 133, 215)';
-                        ctx.lineWidth = 3;
+                        ctx.lineWidth = LINE_THICKNESS;
                         ctx.stroke();
                     }
                     last_temp_x = x;
@@ -1359,7 +1474,7 @@
                             ctx.moveTo(x - 1, last_y);
                             ctx.lineTo(x, y);
                             ctx.strokeStyle = 'rgb(200, 200, 200)';
-                            ctx.lineWidth = 3;
+                            ctx.lineWidth = LINE_THICKNESS;
                             ctx.stroke();
                         }
 
@@ -1528,6 +1643,8 @@
         }
 
     </script>
+
+
 
 
 
