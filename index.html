@@ -544,7 +544,15 @@
             const date_str = date_to_str(date);
             console.log("event on: " + date_str);
             if (event_type_dropdown.value) {
-                add_to_list_map(events, date_str, event_type_dropdown.value);
+
+                // make sure date doesn't already have event
+                if (events.has(date_str)) {
+                    let elements = events.get(date_str);
+                    if (!elements.includes(event_type_dropdown.value)) {
+                        add_to_list_map(events, date_str, event_type_dropdown.value);
+                    }
+                }
+
             }
 
 
@@ -1240,40 +1248,40 @@
                             draw_flag(ctx, text, x, color, background_color, false);
                         }
 
-                        if (type == "fatigue") {
-                            let text = curr_date.getDate() + " fatigue";
-                            let color = "rgba(162, 39, 219, 1.0)";
-                            let background_color = "rgba(162, 39, 219, 0.3)";
-                            draw_flag(ctx, text, x, color, background_color, false);
-                        }
+                        // if (type == "fatigue") {
+                        //     let text = curr_date.getDate() + " fatigue";
+                        //     let color = "rgba(162, 39, 219, 1.0)";
+                        //     let background_color = "rgba(162, 39, 219, 0.3)";
+                        //     draw_flag(ctx, text, x, color, background_color, false);
+                        // }
 
-                        if (type == "tender_breasts") {
-                            let text = curr_date.getDate() + " tender_breasts";
-                            let color = "rgba(162, 39, 219, 1.0)";
-                            let background_color = "rgba(162, 39, 219, 0.3)";
-                            draw_flag(ctx, text, x, color, background_color, false);
-                        }
+                        // if (type == "tender_breasts") {
+                        //     let text = curr_date.getDate() + " tender_breasts";
+                        //     let color = "rgba(162, 39, 219, 1.0)";
+                        //     let background_color = "rgba(162, 39, 219, 0.3)";
+                        //     draw_flag(ctx, text, x, color, background_color, false);
+                        // }
 
-                        if (type == "clearer_slippery_mucus") {
-                            let text = curr_date.getDate() + " clearer slippery mucus";
-                            let color = "rgba(97, 250, 179, 1.0)";
-                            let background_color = "rgba(97, 250, 179, 0.3)";
-                            draw_flag(ctx, text, x, color, background_color, false);
-                        }
+                        // if (type == "clearer_slippery_mucus") {
+                        //     let text = curr_date.getDate() + " clearer slippery mucus";
+                        //     let color = "rgba(97, 250, 179, 1.0)";
+                        //     let background_color = "rgba(97, 250, 179, 0.3)";
+                        //     draw_flag(ctx, text, x, color, background_color, false);
+                        // }
 
-                        if (type == "sticky_or_thicker_mucus") {
-                            let text = curr_date.getDate() + " sticky or thicker mucus";
-                            let color = "rgba(62, 191, 214, 1.0)";
-                            let background_color = "rgba(62, 191, 214, 0.3)";
-                            draw_flag(ctx, text, x, color, background_color, false);
-                        }
+                        // if (type == "sticky_or_thicker_mucus") {
+                        //     let text = curr_date.getDate() + " sticky or thicker mucus";
+                        //     let color = "rgba(62, 191, 214, 1.0)";
+                        //     let background_color = "rgba(62, 191, 214, 0.3)";
+                        //     draw_flag(ctx, text, x, color, background_color, false);
+                        // }
 
-                        if (type == "cramps") {
-                            let text = curr_date.getDate() + " cramps";
-                            let color = "rgba(162, 39, 219, 1.0)";
-                            let background_color = "rgba(162, 39, 219, 0.3)";
-                            draw_flag(ctx, text, x, color, background_color, false);
-                        }
+                        // if (type == "cramps") {
+                        //     let text = curr_date.getDate() + " cramps";
+                        //     let color = "rgba(162, 39, 219, 1.0)";
+                        //     let background_color = "rgba(162, 39, 219, 0.3)";
+                        //     draw_flag(ctx, text, x, color, background_color, false);
+                        // }
 
                         if (type == "positive_ovulation_test" || type == "faintly_positive_ovulation_test") {
                             let text = curr_date.getDate() + (type == "positive_ovulation_test" ? " positive ovulation test" : " faint ovulation test");
@@ -1289,10 +1297,10 @@
                             draw_flag(ctx, text, x, color, background_color, false);
                         }
 
-                        if (type == "sick" || type == "stress") {
-                            ctx.fillStyle = `rgba(147, 181, 72, 0.1)`;
-                            ctx.fillRect(x, Y_MARGIN, step_x, graph_canvas.height - Y_MARGIN - Y_MARGIN_TOP);
-                        }
+                        // if (type == "sick" || type == "stress") {
+                        //     ctx.fillStyle = `rgba(147, 181, 72, 0.1)`;
+                        //     ctx.fillRect(x, Y_MARGIN, step_x, graph_canvas.height - Y_MARGIN - Y_MARGIN_TOP);
+                        // }
 
 
                     }
