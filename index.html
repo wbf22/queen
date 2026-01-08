@@ -85,6 +85,16 @@
             color: rgb(224, 133, 215);
         }
 
+        #temp_time_input {
+            margin: 0px;
+            padding: 0.5rem;
+            place-self: center start;
+            border: 2px solid rgb(224, 133, 215);
+            border-radius: 5px;
+            width: 6rem;
+            color: rgb(224, 133, 215);
+        }
+
         #title {
             padding: 1rem;
             color: rgb(255, 255, 255);
@@ -219,6 +229,12 @@
             margin: 0rem 0rem 0rem 1rem;
         }
 
+        #bb_temp_time_label {
+            padding: 0rem;
+            color: rgb(223, 190, 220);
+            margin: 0rem 0rem 0rem 1rem;
+        }
+
         #element_afcebe5e5f37459d {
             padding: 0rem;
             white-space: pre-wrap;
@@ -300,6 +316,7 @@
                     <div id="element_6ac56891106e444a">
                         <p id="element_8a61cd457c604b3b">BB Temp</p>
                         <p id="bb_temp_label">98.5</p>
+                        <p id="bb_temp_time_label">7:00</p>
                     </div>
                     <div id="element_a1197bce6a994149">
                         <p id="element_afcebe5e5f37459d">Events
@@ -315,9 +332,8 @@
 
                 <div id="element_cfd65f4507ba4e9e">
                     <button id="clear_events" class="pink_border" onclick="clear_events()">Clear</button>
-                    <button id="upload_button" class="upload_download pink_border">upload</button>
-                    <button id="dowload_button" onclick="download_data()"
-                        class="upload_download pink_border">download</button>
+                    <button id="upload_button" class="upload_download pink_border" onclick="upload_data()">upload</button>
+                    <button id="dowload_button" class="upload_download pink_border" onclick="download_data()">download</button>
                 </div>
             </div>
         </div>
@@ -330,6 +346,8 @@
             <div id="element_f2868fccda224bd3">
                 <p id="element_265b987ceb254fe9">Basal Body Temp</p>
                 <input id="temp_input" type="">
+                <p id="element_265b987ceb254fe9">Time</p>
+                <input id="temp_time_input" type="time">
             </div>
             <div id="element_f2868fccda224bd3">
                 <p id="element_265b987ceb254fe9">Event</p>
@@ -455,6 +473,23 @@
             return avg;
         }
 
+        function formatTime24to12(time24) {
+
+            if (!time24) return "";
+
+
+            // Split the string into hours and minutes
+            let [hours, minutes] = time24.split(':').map(Number);
+
+            // Determine AM or PM
+            const ampm = hours >= 12 ? 'pm' : 'am';
+
+            // Convert hours from 24-hour to 12-hour format
+            hours = hours % 12 || 12; // if 0 -> 12, if 13 -> 1, etc.
+
+            return `${hours}:${minutes.toString().padStart(2, '0')} ${ampm}`;
+        }
+
     </script>
 
 
@@ -496,6 +531,7 @@
 
         let event_type_dropdown = document.getElementById("event_type_dropdown");
         let temp_input = document.getElementById("temp_input");
+        let temp_time_input = document.getElementById("temp_time_input");
         let graph_canvas = document.getElementById("graph_canvas");
         const ctx = graph_canvas.getContext('2d');
 
@@ -512,6 +548,7 @@
 
 
             const temp_str = document.getElementById("temp_input").value;
+            const time_str = document.getElementById("temp_time_input").value;
             if (temp_str) {
                 const temp = parseFloat(temp_str);
 
@@ -522,7 +559,7 @@
                     // add to graph
                     bb_temperatures.set(
                         date_to_str(date),
-                        temp
+                        [temp, time_str]
                     );
                 }
 
@@ -607,7 +644,8 @@
 
                     // look at bb temp
                     let curr_date = get_date_plus_days(today_date, j - event_days.length);
-                    let temp = bb_temperatures.get(date_to_str(curr_date));
+                    let temp_and_time = bb_temperatures.get(date_to_str(curr_date));
+                    let temp = temp_and_time ? temp_and_time[0] : null;
                     if (temp) {
                         last_temperatures.push([curr_date, temp]);
 
@@ -957,7 +995,6 @@
         }
 
 
-
     </script>
 
 
@@ -1028,9 +1065,10 @@
             SELECTED_DATE = get_date_plus_days(start_date, graph_canvas.width / 2 / step_x);
 
             // determine temp y step
-            let min_temp = bb_temperatures.size == 0 ? 96 : bb_temperatures.values().next().value;
-            let max_temp = bb_temperatures.size == 0 ? 100 : bb_temperatures.values().next().value;
-            for (let temp of bb_temperatures.values()) {
+            let min_temp = bb_temperatures.size == 0 ? 96 : bb_temperatures.values().next().value[0];
+            let max_temp = bb_temperatures.size == 0 ? 100 : bb_temperatures.values().next().value[0];
+            for (let temp_and_time of bb_temperatures.values()) {
+                let temp = temp_and_time[0];
                 if (temp < min_temp) {
                     min_temp = temp;
                 }
@@ -1093,13 +1131,17 @@
                     document.getElementById("event_date_select").value = date_str;
 
                     const date_key = date_to_str(SELECTED_DATE);
-                    temp_input.value = bb_temperatures.has(date_key) ? bb_temperatures.get(date_key) : "";
-
+                    temp_input.value = bb_temperatures.has(date_key) ? bb_temperatures.get(date_key)[0] : "";
+                    temp_time_input.value = bb_temperatures.has(date_key) ? bb_temperatures.get(date_key)[1] : "";
+                    
                     event_type_dropdown.value = events.has(date_key) ? events.get(date_key)[0] : "";
 
                     // set side view values
                     const bb_temp_label = document.getElementById("bb_temp_label");
                     bb_temp_label.textContent = temp_input.value;
+
+                    const bb_temp_time_label = document.getElementById("bb_temp_time_label");
+                    bb_temp_time_label.textContent = formatTime24to12(temp_time_input.value);
 
                     const event_tags = document.getElementById("event_tags");
                     event_tags.replaceChildren();
@@ -1123,7 +1165,8 @@
                 // draw temperature for this day
                 const date_str = date_to_str(curr_date);
                 if (bb_temperatures.has(date_str)) {
-                    let temp = bb_temperatures.get(date_str);
+                    let temp_and_time = bb_temperatures.get(date_to_str(curr_date));
+                    let temp = temp_and_time ? temp_and_time[0] : null;
                     temperatures.push([new Date(curr_date), temp]);
                     let y = graph_canvas.height - BB_MARGIN - step_y * (temp - min_temp);
                     ctx.beginPath();
@@ -1310,7 +1353,7 @@
                         ctx.setLineDash([]);
 
                     }
-                    else if (prediction == "ovulation_end" || prediction == "conception_date") {
+                    else if (prediction == "ovulation_end") {
                         let text = curr_date.getDate() + " ovulation";
                         let color = "rgba(97, 250, 179, 1.0)";
                         let background_color = "rgba(97, 250, 179, 0.3)";
@@ -1341,6 +1384,21 @@
                         ctx.stroke();
 
                         ctx.setLineDash([]);
+
+                    }
+                    else if (prediction == "conception_date") {
+                        let text = curr_date.getDate() + " conception date 🎉";
+                        let color = "rgba(59, 247, 160, 1.0)";
+                        let background_color = "rgba(97, 250, 179, 0.3)";
+
+                        // flag
+                        draw_flag(ctx, text, x + step_x, color, background_color, false);
+
+                        ctx.beginPath();
+                        ctx.setLineDash([]);
+                        ctx.lineWidth = 1;
+                        ctx.strokeStyle = color;
+                        ctx.stroke();
 
                     }
                     else if (prediction == "period_start") {
@@ -1586,8 +1644,10 @@
 
             for (let entry of bb_temperatures.entries()) {
                 let date = entry[0];
-                let temp = entry[1];
-                csv_content.push([date, "bb_temperature", temp].join(","));
+                let temp_and_time = entry[1];
+                let temp = temp_and_time[0];
+                let time = temp_and_time[1];
+                csv_content.push([date, "bb_temperature", temp, time].join(","));
             }
 
 
@@ -1623,9 +1683,10 @@
                         if (parts.length >= 2) {
                             let date = parts[0];
                             let event = parts[1];
-                            if (event == "bb_temperature" && parts.length == 3) {
+                            if (event == "bb_temperature") {
                                 let temp = parseFloat(parts[2]);
-                                bb_temperatures.set(date, temp);
+                                let time = parts[3];
+                                bb_temperatures.set(date, [temp, time]);
                             }
                             else {
                                 add_to_list_map(events, date, event);
