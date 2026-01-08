@@ -546,11 +546,15 @@
             if (event_type_dropdown.value) {
 
                 // make sure date doesn't already have event
+                let duplicate = false;
                 if (events.has(date_str)) {
                     let elements = events.get(date_str);
-                    if (!elements.includes(event_type_dropdown.value)) {
-                        add_to_list_map(events, date_str, event_type_dropdown.value);
+                    if (elements.includes(event_type_dropdown.value)) {
+                        duplicate = true;
                     }
+                }
+                if (!duplicate) {
+                    add_to_list_map(events, date_str, event_type_dropdown.value);
                 }
 
             }
