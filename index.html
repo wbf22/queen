@@ -542,6 +542,7 @@
             // add to graph
             const date = time_less_date_from_calendar(document.getElementById("event_date_select"));
             const date_str = date_to_str(date);
+            console.log("event on: " + date_str);
             if (event_type_dropdown.value) {
                 add_to_list_map(events, date_str, event_type_dropdown.value);
             }
@@ -564,6 +565,12 @@
                 }
 
             }
+
+            // center calendar on selected date
+            console.log(START_DATE);
+            START_DATE = time_less_date_from_calendar(document.getElementById("event_date_select"));
+            START_DATE = get_date_plus_days(START_DATE, - graph_canvas.width / 2 / GRAPH_DAY_WIDTH_PIXELS);
+            console.log(START_DATE);
 
             // update graph
             make_predictions(events, bb_temperatures);
